@@ -2,13 +2,14 @@ from datetime import date
 from backend.models.account_status import AccountStatus
 
 class Account:
-    def __init__(self, email: str, password_hash: str, cpf: str, birth_date: date, phone: str, address: str, status: AccountStatus = AccountStatus.TRIAL):
+    def __init__(self, email: str, password_hash: str, cpf: str, birth_date: date, phone: str, address: str):
         self.__email = email
         self.__password_hash = password_hash
         self.__cpf = cpf
         self.__birth_date = birth_date
         self.__phone = phone
         self.__address = address
+        self.__status = AccountStatus.TRIAL
 
     @property
     def email(self) -> str:
@@ -36,4 +37,4 @@ class Account:
 
     @property
     def status(self) -> AccountStatus:
-        return self.__statu
+        return self.__status

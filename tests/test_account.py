@@ -1,7 +1,7 @@
 import uuid
 import pytest
 from datetime import date
-from backend.services.account import register_account
+from backend.services.account_services import register_account
 from backend.models.account import Account
 from backend.models.account_status import AccountStatus
 
@@ -14,8 +14,7 @@ def test_registers_new_account_successfully():
         cpf = "12345678901",
         birth_date = date(1995, 5, 15),
         phone = "31999999999",
-        address = "Rua Teste, 123",
-        status = AccountStatus.TRIAL
+        address = "Rua Teste, 123"
     )
     
     valid_plan_id = 1 
