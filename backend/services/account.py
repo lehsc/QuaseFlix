@@ -14,13 +14,13 @@ def register_account(account: Account, plan_id) -> bool:
                 cursor.execute(
                     query,
                     (
-                        account._email,
-                        account._password_hash,
-                        account._cpf,
-                        account._birth_date,
-                        account._phone,
-                        account._address,
-                        account._status.value,      
+                        account.email,
+                        account.password_hash,
+                        account.cpf,
+                        account.birth_date,
+                        account.phone,
+                        account.address,
+                        account.status.value,      
                         plan_id                        
                     )
                 )

@@ -1,0 +1,10 @@
+venv/
+
+.vscode
+
+
+# Cache do Python
+__pycache__/
+
+# Cache do Pytest
+.pytest_cache/

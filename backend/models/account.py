@@ -9,4 +9,31 @@ class Account:
         self.__birth_date = birth_date
         self.__phone = phone
         self.__address = address
-        
+
+    @property
+    def email(self) -> str:
+        return self.__email
+
+    @property
+    def password_hash(self) -> str:
+        return self.__password_hash
+
+    @property
+    def cpf(self) -> str:
+        return self.__cpf
+
+    @property
+    def birth_date(self) -> date:
+        return self.__birth_date
+
+    @property
+    def phone(self) -> str:
+        return self.__phone
+
+    @property
+    def address(self) -> str:
+        return self.__address
+
+    @property
+    def status(self) -> AccountStatus:
+        return self.__statu
