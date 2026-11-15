@@ -95,14 +95,14 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Handle form submission
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
-    // Payload structured to match the database 'account' table
+    // Payload structured to match the backend BaseModel schemas / database 'account' table
     const accountPayload = {
       email: document.getElementById("email").value.trim(),
       password: document.getElementById("password").value,
@@ -112,10 +112,37 @@ document.addEventListener("DOMContentLoaded", () => {
       address: document.getElementById("address").value.trim()
     };
 
-    // Temporarily store in sessionStorage while building the next onboarding steps
-    sessionStorage.setItem("quaseflix_onboarding_account", JSON.stringify(accountPayload));
+    const submitButton = form.querySelector("button[type='submit']");
+    
+    try {
+      if (submitButton) submitButton.disabled = true;
 
-    // Proceed to plan selection page
-    window.location.href = "./plans.html";
+      // Send data to FastAPI backend endpoint
+      const response = await fetch("http://localhost:8000/accounts/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(accountPayload)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || "Erro ao realizar o cadastro. Verifique os dados inseridos.");
+      }
+
+      const result = await response.json();
+
+      // Store account ID in sessionStorage for the next step (plans)
+      sessionStorage.setItem("quaseflix_account_id", result.id);
+
+      // Proceed to plan selection page
+      window.location.href = "./plans.html";
+
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert(error.message || "Não foi possível conectar ao servidor.");
+      if (submitButton) submitButton.disabled = false;
+    }
   });
 });
