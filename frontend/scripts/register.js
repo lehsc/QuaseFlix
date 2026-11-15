@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (submitButton) submitButton.disabled = true;
 
       // Send data to FastAPI backend endpoint
-      const response = await fetch("http://localhost:8000/accounts/", {
+      const response = await fetch("http://localhost:8000/api/accounts/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
