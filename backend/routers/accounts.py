@@ -19,13 +19,15 @@ def api_register_account(payload: AccountCreateSchema):
             phone = payload.phone,
             address = payload.address,
         )
-        if not service_register_account(account):
+        account_id = service_register_account(account)
+        if not account_id:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Unable to register account."
             )
         return {
             "message": "Account registered successfully!",
+            "id": account_id,
             "email": account.email
         }
     except HTTPException:

@@ -132,7 +132,6 @@ CREATE TABLE public.credit_card_details (
     payment_method_id integer NOT NULL,
     card_number character varying(20) NOT NULL,
     holder_name character varying(100) NOT NULL,
-    cvc character varying(5) NOT NULL,
     expiration_date date NOT NULL,
     bank_name character varying(50)
 );

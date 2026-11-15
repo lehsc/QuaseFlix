@@ -33,6 +33,7 @@ def test_register_account_success(account_payload):
     data = response.json()
     assert data["message"] == "Account registered successfully!"
     assert data["email"] == account_payload["email"]
+    assert isinstance(data["id"], int)
 
     # A separate connection verifies that the account was committed.
     with get_db_connection() as conn:
