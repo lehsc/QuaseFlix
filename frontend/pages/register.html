@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuaseFlix - Criar Conta</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/auth.css" />
+</head>
+<body>
+  <div class="auth-wrapper">
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <a href="../index.html" class="brand-logo" aria-label="Página inicial do QuaseFlix">
+        QUASEFLIX
+      </a>
+      <nav class="nav-actions">
+        <a href="./login.html" class="btn btn-primary btn-sm">Entrar</a>
+      </nav>
+    </header>
+
+    <!-- Registration Form Container -->
+    <main class="auth-main">
+      <div class="auth-card">
+        <h1 class="auth-title">Crie a sua conta</h1>
+        <p class="auth-subtitle">Preencha seus dados abaixo para começar sua assinatura.</p>
+
+        <form id="register-form" class="auth-form" novalidate>
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email" class="form-label">E-mail *</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              placeholder="seuemail@exemplo.com"
+              required
+            />
+            <span class="error-message" id="email-error"></span>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label for="password" class="form-label">Senha *</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-input"
+              placeholder="Mínimo de 6 caracteres"
+              minlength="6"
+              required
+            />
+            <span class="error-message" id="password-error"></span>
+          </div>
+
+          <!-- Two-column row for CPF and Birth Date -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cpf" class="form-label">CPF *</label>
+              <input
+                type="text"
+                id="cpf"
+                name="cpf"
+                class="form-input"
+                placeholder="000.000.000-00"
+                maxlength="14"
+                required
+              />
+              <span class="error-message" id="cpf-error"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="birth-date" class="form-label">Data de nascimento *</label>
+              <input
+                type="date"
+                id="birth-date"
+                name="birth_date"
+                class="form-input"
+                required
+              />
+              <span class="error-message" id="birth-date-error"></span>
+            </div>
+          </div>
+
+          <!-- Phone (Optional) -->
+          <div class="form-group">
+            <label for="phone" class="form-label">Telefone <span class="optional-tag">(opcional)</span></label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              class="form-input"
+              placeholder="(31) 99999-9999"
+              maxlength="15"
+            />
+          </div>
+
+          <!-- Address -->
+          <div class="form-group">
+            <label for="address" class="form-label">Endereço completo *</label>
+            <input
+              type="text"
+              id="address"
+              name="address"
+              class="form-input"
+              placeholder="Rua, número, bairro, cidade - UF"
+              required
+            />
+            <span class="error-message" id="address-error"></span>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg btn-block">
+            Continuar
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          <p>Já possui uma conta? <a href="./login.html" class="auth-link">Entrar agora</a>.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../scripts/register.js"></script>
+</body>
+</html>
