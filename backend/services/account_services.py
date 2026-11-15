@@ -1,7 +1,7 @@
 from backend.models.account import Account
 from backend.database.connection import get_db_connection
 
-def register_account(account: Account, plan_id) -> bool:      
+def register_account(account: Account, plan_id = 1) -> bool:      
     query = """
         INSERT INTO public.account (
             email, password_hash, cpf, birth_date, phone, address, plan_id
