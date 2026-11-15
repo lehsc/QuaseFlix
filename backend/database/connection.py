@@ -8,9 +8,9 @@ def get_db_connection():
     conn = psycopg.connect(DATABASE_URL)
     try:
         yield conn
-        conn.commit()  # Salva as alterações se tudo correr bem
+        conn.commit()   
     except Exception:
-        conn.rollback()  # Desfaz em caso de erro
+        conn.rollback()
         raise
     finally:
         conn.close()
