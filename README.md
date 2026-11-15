@@ -22,7 +22,8 @@ QuaseFlix/
 │   ├── __init__.py
 │   ├── main.py                  # FastAPI application entrypoint
 │   ├── database/
-│   │   └── connection.py        # PostgreSQL connection context manager
+│   │   ├── connection.py        # PostgreSQL connection context manager
+│   │   └── schema.sql           # Database tables & schema definition
 │   ├── models/
 │   │   └── account.py           # Pydantic models
 │   ├── routers/
@@ -41,38 +42,32 @@ QuaseFlix/
 ## 1. Database Setup (PostgreSQL)
 
 1. **Create the database and user** (matching `backend/database/connection.py`):
+
    ```bash
    psql -h localhost -p 5432 -U postgres
    ```
+
    Inside the `psql` shell, run:
+
    ```sql
-   ALTER USER postgres WITH PASSWORD 'quaseflix';
    CREATE DATABASE quaseflix;
-   \c quaseflix
+   \q
    ```
 
-2. **Create the required tables** (`plan` and `account`):
+2. **Run the database schema script** located in `backend/database/schema.sql`:
+
+   ```bash
+   psql -h localhost -p 5432 -U postgres -d quaseflix -f backend/database/schema.sql
+   ```
+
+3. **Insert the default subscription plan** (`plan_id = 1`):
+
+   Connect to the database (`psql -h localhost -p 5432 -U postgres -d quaseflix`) and run:
+
    ```sql
-   CREATE TABLE IF NOT EXISTS public.plan (
-       id SERIAL PRIMARY KEY,
-       name VARCHAR(100) NOT NULL
-   );
-
-   INSERT INTO public.plan (id, name)
-   VALUES (1, 'Básico')
+   INSERT INTO public.plan (id, name, price, description)
+   VALUES (1, 'Padrão', 25.90, 'Acesso ilimitado ao catálogo  para assistir em 1 tela por vez.')
    ON CONFLICT (id) DO NOTHING;
-
-   CREATE TABLE IF NOT EXISTS public.account (
-       id SERIAL PRIMARY KEY,
-       email VARCHAR(255) UNIQUE NOT NULL,
-       password_hash TEXT NOT NULL,
-       cpf VARCHAR(14) UNIQUE NOT NULL,
-       birth_date DATE NOT NULL,
-       phone VARCHAR(20),
-       address TEXT,
-       plan_id INTEGER REFERENCES public.plan(id) DEFAULT 1
-   );
-   ```
 
 ---
 
@@ -80,7 +75,7 @@ QuaseFlix/
 
 1. **Clone the repository and navigate to the project root:**
    ```bash
-   git clone <your-repository-url>
+   git clone https://github.com/lehsc/QuaseFlix
    cd QuaseFlix
    ```
 
