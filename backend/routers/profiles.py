@@ -1,12 +1,36 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi.routing import APIRoute
 from fastapi.security import HTTPAuthorizationCredentials
+from psycopg.errors import UndefinedTable, UndefinedColumn
 from backend.routers.auth import get_current_account, _bearer_scheme
 from backend.models.authenticated_account import AuthenticatedAccount
 from backend.models.profile import SelectedProfile
 from backend.schemas.profile_schema import ProfileWrite, OwnerConfirmation
 from backend.services import profile_services as service
 
-router = APIRouter(tags=['Profiles'])
+class ProfileRoute(APIRoute):
+    def get_route_handler(self):
+        handler = super().get_route_handler()
+
+        async def handle(request):
+            try:
+                return await handler(request)
+            except (UndefinedTable, UndefinedColumn):
+                logging.getLogger(__name__).exception(
+                    'Profile database is not ready. Apply backend/database/migrations/004_profiles.sql.'
+                )
+                # A handled response retains CORS headers. Unhandled database
+                # errors otherwise appear as an opaque "Failed to fetch".
+                raise HTTPException(
+                    503, 'Os perfis estão indisponíveis até a atualização do sistema. Contate o responsável.'
+                )
+
+        return handle
+
+
+router = APIRouter(tags=['Profiles'], route_class=ProfileRoute)
 
 
 def profile_identity(account: AuthenticatedAccount = Depends(get_current_account),

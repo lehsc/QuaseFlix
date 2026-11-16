@@ -6,27 +6,29 @@
 <title>Cadastro QuaseFlix</title>
 <link rel="stylesheet" href="../styles/global.css">
 <link rel="stylesheet" href="../styles/auth.css">
-<style>[hidden]{display:none!important}label{display:block;margin:12px 0}</style>
+<style>[hidden]{display:none!important}label{display:block;margin:12px 0}.form-feedback,.field-error{color:#ffb3b3;margin:12px 0;line-height:1.4}.field-error{display:block;margin:4px 0 0}.form-input.input-error,.form-input.input-error:focus{border-color:#ff6969;box-shadow:0 0 0 1px #ff6969}.btn:disabled{opacity:.55;cursor:not-allowed}</style>
 </head>
 <body>
 <main class="auth-main">
 <div class="auth-card">
 <h1>Criar conta</h1>
 <p>Demonstração: e-mails e pagamentos simulados. Nenhuma cobrança real.</p>
-<p id="status" role="status">
+<p id="status" role="alert" class="form-feedback">
 </p>
 <form id="start">
 <label>E-mail<input name="email" type="email" required class="form-input">
 </label>
-<button class="btn btn-primary">Enviar código</button>
+<button type="submit" class="btn btn-primary btn-lg btn-block">Enviar código</button>
 </form>
 <div id="google">
 </div>
+<button id="google-unavailable" type="button" class="btn btn-primary btn-lg btn-block" disabled>Continuar com Google</button>
+<p id="google-status" class="form-feedback" role="status"></p>
 <form id="verify" hidden>
 <p>Consulte o código na caixa de saída local indicada no README.</p>
 <label>Código<input name="code" required pattern="[0-9]{6}" class="form-input">
 </label>
-<button class="btn btn-primary">Verificar</button>
+<button type="submit" class="btn btn-primary btn-lg btn-block">Verificar</button>
 </form>
 <form id="complete" hidden>
 <label>Nome completo<input name="full_name" required class="form-input">
@@ -63,9 +65,10 @@
 <label>Ano<input name="expiration_year" type="number" class="form-input">
 </label>
 </fieldset>
-<button class="btn btn-primary">Finalizar cadastro</button>
+<p id="complete-status" class="form-feedback" role="alert"></p>
+<button type="submit" class="btn btn-primary btn-lg btn-block">Finalizar cadastro</button>
 </form>
-<button id="restart" type="button">Recomeçar</button>
+<button id="restart" type="button" class="btn btn-secondary btn-lg btn-block">Recomeçar</button>
 <p>
 <a href="login.html">Entrar</a>
 </p>

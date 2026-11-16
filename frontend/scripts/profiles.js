@@ -20,14 +20,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!token) { logout(); return; }
 
   async function request(path, method = 'GET', body) {
-    const response = await fetch(api + path, {
-      method,
-      headers: {Authorization: `Bearer ${token}`, 'Content-Type': 'application/json'},
-      ...(body === undefined ? {} : {body: JSON.stringify(body)})
-    });
+    let response;
+    try {
+      response = await fetch(api + path, {
+        method,
+        headers: {Authorization: `Bearer ${token}`, 'Content-Type': 'application/json'},
+        ...(body === undefined ? {} : {body: JSON.stringify(body)})
+      });
+    } catch {
+      throw new Error('Não foi possível conectar ao servidor. Verifique se ele está disponível e tente novamente.');
+    }
     if (response.status === 401) { logout(); throw new Error('Entre novamente.'); }
     if (response.status === 402) throw new Error('Regularize sua assinatura em Gerenciar assinatura.');
-    const data = response.status === 204 ? null : await response.json();
+    const data = response.status === 204 ? null : await response.json().catch(() => ({}));
     if (!response.ok) {
       const error = new Error(typeof data.detail === 'string' ? data.detail : 'Verifique os dados do perfil.');
       error.status = response.status;

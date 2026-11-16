@@ -54,3 +54,24 @@ def test_two_logins_in_same_second_have_independent_tokens():
 def test_profiles_require_authentication(method,path,body):
     response = TestClient(app).request(method,path,**({'json':body} if body is not None else {}))
     assert response.status_code == 401
+
+
+@pytest.mark.parametrize('database_error', ['UndefinedTable', 'UndefinedColumn'])
+def test_missing_profile_migration_returns_readable_cors_error(monkeypatch, database_error):
+    from psycopg import errors
+    from backend.routers.profiles import profile_identity
+    from backend.services import profile_services
+
+    def missing_schema(*args):
+        raise getattr(errors, database_error)('Test database schema is incomplete')
+
+    monkeypatch.setattr(profile_services, 'current_selection', missing_schema)
+    app.dependency_overrides[profile_identity] = lambda: (1, 'test-session')
+    try:
+        response = TestClient(app).get('/api/profiles/current', headers={'Origin':'http://127.0.0.1:5500'})
+        assert response.status_code == 503
+        assert 'atualização do sistema' in response.json()['detail']
+        assert 'access-control-allow-origin' in response.headers
+        assert 'Test database' not in response.text
+    finally:
+        app.dependency_overrides.pop(profile_identity, None)
