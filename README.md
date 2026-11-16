@@ -227,3 +227,69 @@ linked; they must use password login. A Google registrant can use Google again o
 
 The development outbox is for local demonstrations only. It is not an email
 service. Payment details are validation-only, with no provider charge or token.
+
+## Subscription lifecycle (RF05–RF06)
+
+For an existing database, apply the subscription migration after migration 002:
+
+```bash
+psql -h localhost -U postgres -d quaseflix -v ON_ERROR_STOP=1 \
+  -f backend/database/migrations/003_subscription.sql
+```
+
+Fresh databases include these tables in `schema.sql`. The migration does not
+charge existing accounts. Starting the worker processes any elapsed billing
+periods for non-canceled accounts; use a separate local test database for demos.
+
+Keep the API and frontend running as described above. In a third terminal,
+activate the same virtual environment and start the billing worker:
+
+```bash
+python -m backend.billing_worker
+```
+
+It checks once per minute. `python -m backend.billing_worker --once` processes
+currently due subscriptions and writes pending simulated billing emails once.
+No clock or trial-duration setting needs to be changed. The automated integration
+tests create their own dated test accounts to cover expiry.
+
+Open `http://localhost:5500/pages/subscription.html`, also linked from login and
+profiles. This screen supports management login even when normal access is
+blocked, displays invoices and debt, lets the owner choose an existing payment
+method or add a simulated boleto, confirms simulated settlement, cancels the
+subscription, and restores canceled accounts. Cancellation clears the browser
+session and normal login is refused while the account is canceled.
+
+Billing rules used in this demonstration:
+
+- The trial lasts exactly 30 days from account creation. After that, the account
+  becomes ACTIVE and the selected plan is billed each calendar month. Month-end
+  dates are clamped to the last valid day of the following month.
+- The newest registered payment method is used for automatic billing. Valid
+  cards simulate successful charges; expired or missing cards leave unpaid debt.
+  Boleto invoices remain unpaid until explicitly settled in the management UI,
+  with a three-day payment window. No real money is collected.
+- ACTIVE accounts with overdue unpaid invoices cannot use normal login or
+  protected content, but management login remains available. Payment restores
+  eligibility; it does not reactivate an explicitly canceled account.
+- Cancellation requires all outstanding invoices to be settled, including
+  pending boletos. It then stops billing immediately. Canceling during an
+  unexpired trial incurs no invoice.
+- Restoration preserves the original trial end and any remaining paid period.
+  Otherwise it starts a new billing period immediately. It never charges for
+  time spent canceled or awards a fresh trial.
+- Billing catches up elapsed periods while the worker was stopped for an active
+  account. Account locks and unique invoice periods prevent duplicate invoices.
+  Plan price changes apply to future invoices; issued amounts are retained.
+- Simulated billing emails use a durable database outbox and deterministic local
+  files named `billing-<id>.json` in `QUASEFLIX_OUTBOX` (default
+  `/tmp/quaseflix-outbox`). Failed file delivery is retried by the worker.
+
+New API routes are grouped under `/api/subscription` in Swagger. They derive the
+account from a signed token, not a client-supplied account ID. The management
+login verifies the same password without requiring an active subscription.
+
+Integration tests in `tests/test_subscription_integration.py` require
+`QUASEFLIX_TEST_DATABASE_URL` pointing to an initialized disposable database.
+They create and remove their own accounts and plans. All other existing database
+tests still use the connection configured in `backend/database/connection.py`.
