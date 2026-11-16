@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // What the user reads for each HTTP status the login endpoint can answer with.
   const LOGIN_ERROR_MESSAGES = {
     401: "E-mail ou senha incorretos.",
-    402: "Seu período de teste terminou e não há uma assinatura ativa. Regularize o pagamento para voltar a assistir.",
+    402: "Sua assinatura precisa ser regularizada. Acesse Gerenciar / restaurar assinatura para consultar os débitos.",
     403: "Esta conta foi cancelada e não pode ser acessada."
   };
   const GENERIC_ERROR_MESSAGE = "Não foi possível entrar. Tente novamente em instantes.";

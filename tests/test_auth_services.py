@@ -50,6 +50,8 @@ class FakeConnection:
 @pytest.fixture
 def fake_database(monkeypatch):
     """Call it with the row the database must answer; returns the executed queries."""
+    from backend.services import subscription_services
+    monkeypatch.setattr(subscription_services, "ensure_paid", lambda account_id: None)
     queries = []
 
     def install(row):

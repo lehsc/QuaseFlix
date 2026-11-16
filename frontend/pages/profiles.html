@@ -1,38 +1,58 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QuaseFlix - Perfis</title>
-  <link rel="stylesheet" href="../styles/global.css" />
-  <link rel="stylesheet" href="../styles/auth.css" />
-  <link rel="stylesheet" href="../styles/login.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QuaseFlix — Perfis</title>
+  <link rel="stylesheet" href="../styles/global.css">
+  <link rel="stylesheet" href="../styles/auth.css">
+  <link rel="stylesheet" href="../styles/profiles.css">
 </head>
-<body>
-  <div class="auth-wrapper">
-    <!-- Top Navigation Bar -->
-    <header class="navbar">
-      <a href="../index.html" class="brand-logo" aria-label="Página inicial do QuaseFlix">
-        QUASEFLIX
-      </a>
-    </header>
-
-    <!--
-      PLACEHOLDER: this is where the login takes the user. Replace this card with
-      the real profile selection screen (RF07). It only proves that the session
-      works: it asks the server who is logged in and offers a way to log out.
-    -->
-    <main class="auth-main">
-      <div class="auth-card">
-        <h1 class="auth-title">Login realizado</h1>
-        <p id="welcome-text" class="auth-subtitle">Verificando a sua sessão...</p>
-        <button type="button" id="btn-logout" class="btn btn-primary btn-lg btn-block">
-          Sair
-        </button>
+<body class="auth-wrapper">
+  <header class="navbar">
+    <a href="../index.html" class="brand-logo">QUASEFLIX</a>
+    <button id="logout" class="btn" type="button">Sair</button>
+  </header>
+  <main class="profiles-main">
+    <h1>Quem vai assistir?</h1>
+    <p id="selected-profile" aria-live="polite">Carregando seus perfis…</p>
+    <p id="status" role="status"></p>
+    <button id="retry" class="btn" type="button" hidden>Tentar novamente</button>
+    <div id="profile-list" class="profile-grid" aria-label="Perfis"></div>
+    <div class="profile-actions">
+      <button id="add-profile" class="btn btn-primary" type="button" disabled>Adicionar perfil</button>
+      <span id="profile-count"></span>
+      <a href="./subscription.html">Gerenciar assinatura</a>
+    </div>
+    <section id="editor" class="auth-card" hidden aria-labelledby="editor-title">
+      <h2 id="editor-title">Novo perfil</h2>
+      <form id="profile-form" class="auth-form">
+        <label class="form-group">Nome
+          <input id="profile-name" class="form-input" name="name" required maxlength="100" autocomplete="off">
+        </label>
+        <label><input id="profile-kids" type="checkbox" name="is_kids"> Perfil infantil</label>
+        <p class="muted">Perfis infantis terão acesso apenas a títulos com classificação Livre. Alterar essa proteção exige a senha do titular.</p>
+        <fieldset><legend>Gêneros favoritos (opcional)</legend><div id="genres" class="genre-options"></div></fieldset>
+        <p class="muted">Você pode continuar sem escolher gêneros ou desmarcar todos para limpar as preferências.</p>
+        <div class="profile-actions">
+          <button class="btn btn-primary" type="submit">Salvar perfil</button>
+          <button id="close-editor" class="btn" type="button">Voltar</button>
+        </div>
+      </form>
+    </section>
+    <p class="muted">O catálogo ainda está em desenvolvimento. Sua seleção e preferências ficam salvas para esta sessão.</p>
+  </main>
+  <dialog id="owner-dialog" aria-labelledby="owner-title">
+    <form id="owner-form" class="auth-form">
+      <h2 id="owner-title">Confirmação do titular</h2>
+      <p id="owner-reason"></p>
+      <label>Senha da conta<input id="owner-password" class="form-input" type="password" maxlength="128" autocomplete="current-password" required></label>
+      <div class="profile-actions">
+        <button class="btn btn-primary" type="submit">Confirmar</button>
+        <button id="owner-cancel" class="btn" type="button">Voltar</button>
       </div>
-    </main>
-  </div>
-
+    </form>
+  </dialog>
   <script src="../scripts/session.js"></script>
   <script src="../scripts/profiles.js"></script>
 </body>

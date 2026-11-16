@@ -1,6 +1,7 @@
 import logging
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
+from backend.routers.auth import get_current_account
 
 from backend.exceptions import AccountNotFoundError, PlanNotFoundError
 from backend.models.plan import Plan
@@ -36,7 +37,9 @@ def api_list_plans():
 
 
 @router.put("/api/accounts/{account_id}/plan")
-def api_select_plan(account_id: int, payload: PlanSelectSchema):
+def api_select_plan(account_id: int, payload: PlanSelectSchema, account = Depends(get_current_account)):
+    if account.id != account_id:
+        raise HTTPException(403, "Account access denied.")
     try:
         plan = service_select_plan(account_id, payload.plan_id)
     except (PlanNotFoundError, AccountNotFoundError) as e:
