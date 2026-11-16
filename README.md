@@ -275,6 +275,7 @@ Enter the six-digit code from `Verification code: ...`, finish the form and use
 the boleto option for the simplest local flow. Then log in, select the default
 `Principal` profile and open the catalog. The Google warning is expected when
 `GOOGLE_CLIENT_ID` is empty and does not block password-based registration.
+
 ---
 
 ## 4. Payment Methods API
