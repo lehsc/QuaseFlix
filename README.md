@@ -293,3 +293,67 @@ Integration tests in `tests/test_subscription_integration.py` require
 `QUASEFLIX_TEST_DATABASE_URL` pointing to an initialized disposable database.
 They create and remove their own accounts and plans. All other existing database
 tests still use the connection configured in `backend/database/connection.py`.
+
+## Profiles and preferences (RF07–RF09)
+
+For an existing database, apply migration 004 after migrations 002 and 003:
+
+```bash
+psql -h localhost -U postgres -d quaseflix -v ON_ERROR_STOP=1 \
+  -f backend/database/migrations/004_profiles.sql
+```
+
+The fresh schema includes this migration. It adds a **Principal** profile to
+accounts with no profiles and installs a trigger so new accounts receive their
+first profile in the account creation transaction. Existing profiles are kept.
+The migration stops with an explicit error if legacy data has orphaned profiles,
+empty names, duplicate names ignoring case and surrounding spaces, or more than
+four profiles for an account. Resolve those records before retrying.
+
+After login, `frontend/pages/profiles.html` provides profile selection, creation,
+editing, deletion, genre preferences, and the child-profile setting. Accounts
+must retain 1–4 profiles. Names are trimmed, limited to 100 characters, and unique
+within each account ignoring case. Profile writes lock the account row so
+concurrent requests cannot exceed four profiles or delete the last one.
+Preferences are optional, isolated per profile, and can be cleared. Genre IDs
+must refer to the shared seeded genre list.
+
+Selection is associated with the signed login token in `profile_session`.
+Tokens have a unique `jti`, so separate logins can select different profiles.
+The browser caches the selection only for display; the server remains the
+source of truth. A selected child profile locks that session to child mode.
+Clearing browser profile data or deleting the selected profile in another
+session cannot remove the lock. Switching to an unrestricted profile requires
+the owner's account password. Profile creation, edits, and deletion from child
+mode also require that password. Turning off a profile's child setting always
+requires owner confirmation, even from an adult session. Confirmation passwords
+are verified per operation and are never stored in profile/session records.
+
+API routes (all require a current, eligible account):
+
+| Method | Route | Behavior |
+|---|---|---|
+| GET | `/api/genres` | Available genres |
+| GET | `/api/profiles` | Current account's profiles and preferences |
+| POST | `/api/profiles` | Create `{name, is_kids, genre_ids, password?}` |
+| PUT | `/api/profiles/{id}` | Replace name, child setting and preferences |
+| DELETE | `/api/profiles/{id}` | Delete with JSON `{}` or `{password}` |
+| POST | `/api/profiles/{id}/select` | Select with JSON `{}` or `{password}` |
+| GET | `/api/profiles/current` | Authoritative selected profile and restriction state |
+
+Requests never accept an account ID for profile ownership. Foreign profile IDs
+return 404. Canceled/overdue accounts must use subscription management instead.
+
+**Catalog integration remains pending (RF10–RF14).** This change persists
+preferences and parental settings and provides a tested shared content policy;
+it does not implement catalog browsing, search, recommendations screens, or
+playback. Future content endpoints must use `require_selected_profile` and the
+functions in `backend/services/content_policy.py` for browsing, search, details,
+and playback. `media.age_rating` accepts 0 (Livre), 10, 12, 14, 16, 18 or NULL.
+Child mode allows only explicitly classified Livre titles; unknown ratings are
+excluded. Content is filtered before ranking by preferred genres. If no eligible
+title matches the preferences, the complete eligible collection remains visible.
+No frontend filtering or client-provided profile ID may replace these checks.
+
+Profile integration tests require `QUASEFLIX_TEST_DATABASE_URL` pointing to an
+initialized disposable database, as with the subscription integration tests.

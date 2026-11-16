@@ -18,7 +18,7 @@ async function request(path = '', body) {
   return data;
 }
 function logout() {
-  for (const key of ['subscription_token', 'quaseflix_token', 'quaseflix_account']) sessionStorage.removeItem(key);
+  for (const key of ['subscription_token', 'quaseflix_token', 'quaseflix_account', 'quaseflix_profile']) sessionStorage.removeItem(key);
   token = null;
   login_form.hidden = false;
   panel.hidden = true;

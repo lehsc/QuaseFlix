@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.routers import accounts, auth, payment_methods, plans, registration, subscriptions
+from backend.routers import accounts, auth, payment_methods, plans, registration, subscriptions, profiles
 
 app = FastAPI(
     title="QuaseFlix API",
@@ -35,3 +35,5 @@ app.include_router(plans.router)
 app.include_router(registration.router)
 
 app.include_router(subscriptions.router)
+
+app.include_router(profiles.router)
