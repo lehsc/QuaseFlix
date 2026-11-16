@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from backend.schemas.account_schema import AccountCreateSchema # Your Pydantic schema
 from backend.models.account import Account
+from backend.security import hash_password
 from backend.services.account_services import register_account as service_register_account
 
 router = APIRouter(
@@ -13,7 +14,7 @@ def api_register_account(payload: AccountCreateSchema):
     try:
         account = Account(
             email = payload.email,
-            password_hash = payload.password_hash,
+            password_hash = hash_password(payload.password),
             cpf = payload.cpf,
             birth_date = payload.birth_date,
             phone = payload.phone,

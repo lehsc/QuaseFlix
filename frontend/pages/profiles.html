@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuaseFlix - Perfis</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/auth.css" />
+  <link rel="stylesheet" href="../styles/login.css" />
+</head>
+<body>
+  <div class="auth-wrapper">
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <a href="../index.html" class="brand-logo" aria-label="Página inicial do QuaseFlix">
+        QUASEFLIX
+      </a>
+    </header>
+
+    <!--
+      PLACEHOLDER: this is where the login takes the user. Replace this card with
+      the real profile selection screen (RF07). It only proves that the session
+      works: it asks the server who is logged in and offers a way to log out.
+    -->
+    <main class="auth-main">
+      <div class="auth-card">
+        <h1 class="auth-title">Login realizado</h1>
+        <p id="welcome-text" class="auth-subtitle">Verificando a sua sessão...</p>
+        <button type="button" id="btn-logout" class="btn btn-primary btn-lg btn-block">
+          Sair
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <script src="../scripts/session.js"></script>
+  <script src="../scripts/profiles.js"></script>
+</body>
+</html>

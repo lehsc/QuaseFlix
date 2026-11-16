@@ -6,6 +6,7 @@ from http import HTTPStatus
 from backend.main import app
 from backend.database.connection import get_db_connection
 from backend.routers import accounts
+from backend.security import verify_password
 
 # Create a test client using FastAPI app object
 client = TestClient(app)
@@ -17,7 +18,7 @@ def account_payload():
     
     return {
         "email": f"user_{uuid.uuid4().hex[:8]}@quaseflix-test.com",
-        "password_hash": "securehashedpassword123",
+        "password": "Senha@12345",
         "cpf": random_cpf,
         "birth_date": "2000-05-15",
         "phone": "31999998888",
@@ -54,3 +55,55 @@ def test_register_account_failure(account_payload, monkeypatch):
 
     assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
     assert response.json() == {"detail": "Unable to register account."}
+
+
+def test_register_account_stores_only_a_hash_of_the_password(account_payload):
+    response = client.post("/api/accounts/", json = account_payload)
+
+    try:
+        assert response.status_code == HTTPStatus.CREATED
+        assert account_payload["password"] not in response.text
+
+        with get_db_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "SELECT password_hash FROM public.account WHERE email = %s",
+                    (account_payload["email"],)
+                )
+                stored_hash = cursor.fetchone()[0]
+
+        assert stored_hash != account_payload["password"]
+        assert account_payload["password"] not in stored_hash
+        assert verify_password(account_payload["password"], stored_hash)
+    finally:
+        # Unlike the account_id fixture, this test creates the account itself.
+        with get_db_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM public.account WHERE email = %s",
+                    (account_payload["email"],)
+                )
+
+
+@pytest.mark.parametrize("password", ["12345", "x" * 129])
+def test_register_account_rejects_invalid_password_length(account_payload, password):
+    account_payload["password"] = password
+
+    response = client.post("/api/accounts/", json = account_payload)
+
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+    with get_db_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT COUNT(*) FROM public.account WHERE email = %s",
+                (account_payload["email"],)
+            )
+            assert cursor.fetchone()[0] == 0
+
+
+def test_register_account_requires_a_password(account_payload):
+    del account_payload["password"]
+
+    response = client.post("/api/accounts/", json = account_payload)
+
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY

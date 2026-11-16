@@ -5,11 +5,15 @@ from http import HTTPStatus
 
 import pytest
 
+TEST_PASSWORD = "Senha@12345"
+
 
 @pytest.fixture
-def account_id():
+def registered_account():
     """
     Registers a real account through the API and deletes it after the test.
+    Gives its id, e-mail and the password that was used (the database only
+    keeps a hash of it), so the tests can log in with it.
     ON DELETE CASCADE also removes whatever was created for that account
     (payment methods, profiles, ...).
     """
@@ -22,9 +26,10 @@ def account_id():
 
     client = TestClient(app)
     random_cpf = "".join([str(random.randint(0, 9)) for _ in range(11)])
+    email = f"user_{uuid.uuid4().hex[:8]}@quaseflix-test.com"
     response = client.post("/api/accounts/", json = {
-        "email": f"user_{uuid.uuid4().hex[:8]}@quaseflix-test.com",
-        "password_hash": "securehashedpassword123",
+        "email": email,
+        "password": TEST_PASSWORD,
         "cpf": random_cpf,
         "birth_date": "2000-05-15",
         "phone": "31999998888",
@@ -33,8 +38,14 @@ def account_id():
     assert response.status_code == HTTPStatus.CREATED
     new_account_id = response.json()["id"]
 
-    yield new_account_id
+    yield {"id": new_account_id, "email": email, "password": TEST_PASSWORD}
 
     with get_db_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("DELETE FROM public.account WHERE id = %s", (new_account_id,))
+
+
+@pytest.fixture
+def account_id(registered_account):
+    """The id of a real account (see registered_account)."""
+    return registered_account["id"]

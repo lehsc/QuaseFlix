@@ -1,0 +1,15 @@
+/* Hidden elements must stay hidden even when a class sets "display" */
+[hidden] {
+  display: none !important;
+}
+
+/* Message for errors that belong to the whole form (wrong password, canceled account, ...) */
+.form-alert {
+  padding: 0.85rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #ffb3b8;
+  background-color: rgba(229, 9, 20, 0.12);
+  border: 1px solid var(--color-brand-red);
+  border-radius: var(--border-radius-sm);
+}
