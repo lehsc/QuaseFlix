@@ -5,3 +5,4 @@ httpx>=0.27,<1
 pytest>=8,<10
 google-auth
 requests
+python-dotenv>=1,<2

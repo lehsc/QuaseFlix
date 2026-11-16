@@ -35,25 +35,30 @@ QuaseFlix/
 │   ├── schemas/
 │   │   ├── account_schema.py    # Pydantic request schemas
 │   │   ├── payment_method_schema.py
-│   │   └── catalog_schema.py    # Catalog & media detail response schemas
+│   │   ├── catalog_schema.py    # Catalog & media detail response schemas
+│   │   └── streaming_schema.py  # Playback session and progress contracts
 │   ├── routers/
 │   │   ├── accounts.py          # Account API endpoints
 │   │   ├── payment_methods.py   # Payment method API endpoints
-│   │   └── catalog.py           # Catalog, search & media detail API endpoints
+│   │   ├── catalog.py           # Catalog, search & media detail API endpoints
+│   │   └── streaming.py         # Authorized playback and resume endpoints
 │   └── services/
 │       ├── account_services.py  # Business logic & SQL queries
 │       ├── payment_method_services.py
-│       └── catalog_services.py  # Catalog queries, filters & search
+│       ├── catalog_services.py  # Catalog queries, filters & search
+│       └── streaming_services.py # Sources, tracks and per-profile progress
 ├── frontend/                    # Landing page & UI files (index.html)
-│   ├── pages/                   # register.html, payment.html, catalog.html, media.html
-│   ├── scripts/                 # landing.js, register.js, payment.js, catalog-api.js, catalog.js, media.js
-│   └── styles/                  # global.css, landing.css, auth.css, payment.css, catalog.css
+│   ├── pages/                   # Includes catalog, media details and player.html
+│   ├── scripts/                 # Includes catalog and player behavior
+│   └── styles/                  # Shared, catalog and responsive player styles
 ├── tests/
 │    ├── test_account.py                  # Pytest integration tests (accounts)
 │    ├── test_payment_method.py           # Pytest integration tests (payment methods API)
 │    ├── test_payment_method_models.py    # Unit tests (no database needed)
-│    ├── test_catalog.py                  # RF10–RF12 PostgreSQL integration tests
-│    └── test_catalog_api.py              # HTTP validation, access control & errors
+│    ├── test_catalog.py                  # Catalog PostgreSQL integration tests
+│    ├── test_catalog_api.py              # Catalog HTTP access control & errors
+│    ├── test_streaming.py                # Streaming service rules
+│    └── test_streaming_api.py            # Playback HTTP access and validation
 ├── pytest.ini                   # Pytest path configuration
 └── README.md
 ```
@@ -122,17 +127,154 @@ QuaseFlix/
 
 ## 3. Running the Application
 
-### Start the FastAPI Backend
-From the **project root directory** (`QuaseFlix/`), run:
+The commands below are a complete development setup (in this case, for **Git Bash on Windows**).
+Run every command from the repository root. PostgreSQL must already be installed
+and running. The examples assume PostgreSQL 18 in its default installation path;
+change `PSQL` if another version/path is installed. On Linux/macOS, use
+`PSQL=psql` and activate the virtual environment with `source venv/bin/activate`.
+
+### 3.1 Install the application
+
 ```bash
-uvicorn backend.main:app --reload
+cd /c/path/to/QuaseFlix
+python -m venv venv
+source venv/Scripts/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
-* **API Base URL:** `http://127.0.0.1:8000`
-* **Interactive Swagger Docs:** `http://127.0.0.1:8000/docs`
 
-### Open the Frontend
-* Open the landing page (`index.html`) directly in your browser or serve it using VS Code's **Live Server** extension (default port `5500`). CORS is pre-configured in `backend/main.py` to accept requests from the frontend.
+### 3.2 Create the local configuration
 
+`.env` is local-only and ignored by Git. Create it from the safe template:
+
+```bash
+cp .env.example .env
+python -c "import secrets; print(secrets.token_urlsafe(64))"
+```
+
+Open `.env`, replace the database password and paste the generated value into
+`QUASEFLIX_SECRET_KEY`:
+
+```env
+DATABASE_URL=postgresql://postgres:YOUR_POSTGRES_PASSWORD@localhost:5432/quaseflix
+QUASEFLIX_SECRET_KEY=THE_RANDOM_VALUE_GENERATED_ABOVE
+QUASEFLIX_OUTBOX=./tmp/quaseflix-outbox
+GOOGLE_CLIENT_ID=
+```
+
+The password inside `DATABASE_URL` must be URL-encoded if it contains characters
+such as `@`, `:`, `/`, `#` or `%`. `GOOGLE_CLIENT_ID` is optional; leaving it
+empty only disables Google Sign-In. E-mail delivery and payments remain local
+simulations.
+
+### 3.3 Create and initialize a new database
+
+For a **new local database**, run the complete schema once. Do not run
+`schema.sql` over an already initialized database; use the migrations below for
+that case.
+
+```bash
+PSQL="/c/Program Files/PostgreSQL/18/bin/psql.exe"
+
+# The commands prompt for the PostgreSQL password.
+"$PSQL" -h localhost -p 5432 -U postgres -d postgres \
+  -tc "SELECT 1 FROM pg_database WHERE datname='quaseflix'" | grep -q 1 || \
+"$PSQL" -h localhost -p 5432 -U postgres -d postgres \
+  -c "CREATE DATABASE quaseflix"
+
+"$PSQL" -h localhost -p 5432 -U postgres -d quaseflix \
+  -v ON_ERROR_STOP=1 -f backend/database/schema.sql
+
+"$PSQL" -h localhost -p 5432 -U postgres -d quaseflix \
+  -v ON_ERROR_STOP=1 \
+  -c "INSERT INTO public.plan(id,name,price,description) VALUES (1,'Padrão',25.90,'Acesso ilimitado') ON CONFLICT(id) DO NOTHING"
+
+"$PSQL" -h localhost -p 5432 -U postgres -d quaseflix \
+  -v ON_ERROR_STOP=1 -f backend/database/seeds/catalog_demo.sql
+```
+
+For an **existing database**, do not recreate it. Back it up and apply every
+migration in order; each command stops immediately on a SQL error:
+
+```bash
+PSQL="/c/Program Files/PostgreSQL/18/bin/psql.exe"
+PG_DUMP="/c/Program Files/PostgreSQL/18/bin/pg_dump.exe"
+
+"$PG_DUMP" -h localhost -p 5432 -U postgres -d quaseflix \
+  -Fc -f quaseflix-before-migrations.backup
+
+for migration in \
+  backend/database/migrations/001_credit_card_drop_cvc.sql \
+  backend/database/migrations/002_catalog.sql \
+  backend/database/migrations/002_registration.sql \
+  backend/database/migrations/003_subscription.sql \
+  backend/database/migrations/004_profiles.sql \
+  backend/database/migrations/005_streaming.sql
+do
+  "$PSQL" -h localhost -p 5432 -U postgres -d quaseflix \
+    -v ON_ERROR_STOP=1 -f "$migration" || break
+done
+```
+
+Verify the required modules before starting the server. None of these columns
+may be `NULL`:
+
+```bash
+"$PSQL" -h localhost -p 5432 -U postgres -d quaseflix -c \
+  "SELECT to_regclass('public.plan') AS plans, to_regclass('public.registration_session') AS registration, to_regclass('public.profile_session') AS profiles, to_regclass('public.subscription_invoice') AS subscriptions, to_regclass('public.playback_progress') AS streaming;"
+```
+
+### 3.4 Start the backend (terminal 1)
+
+First make sure no stale process is listening on port 8000, then start Uvicorn.
+`--env-file` loads the same database configuration before the application is
+imported.
+
+```bash
+cd /c/path/to/QuaseFlix
+source venv/Scripts/activate
+python -m uvicorn backend.main:app \
+  --host 127.0.0.1 --port 8000 --reload --env-file .env
+```
+
+Keep this terminal open. From another terminal, both checks must return HTTP 200:
+
+```bash
+curl -i http://localhost:8000/api/plans
+curl -i http://localhost:8000/api/registration/config
+```
+
+API documentation is available at `http://127.0.0.1:8000/docs`. If an endpoint
+returns 500, read the traceback in terminal 1 before opening the frontend.
+
+### 3.5 Start the frontend (terminal 2)
+
+Serve the `frontend` directory over HTTP; do not open the HTML through a
+`file://` URL.
+
+```bash
+cd /c/path/to/QuaseFlix
+source venv/Scripts/activate
+python -m http.server 5500 --bind 127.0.0.1 --directory frontend
+```
+
+Open `http://127.0.0.1:5500/`. The application API remains at
+`http://localhost:8000`, as expected by the frontend scripts.
+
+### 3.6 Complete the simulated registration
+
+Choose **Create account**, enter a new e-mail and request the verification code.
+The project does not send real e-mail: it writes a JSON message locally. Read the
+newest message with:
+
+```bash
+cat "$(ls -t tmp/quaseflix-outbox/*.json | head -n 1)"
+```
+
+Enter the six-digit code from `Verification code: ...`, finish the form and use
+the boleto option for the simplest local flow. Then log in, select the default
+`Principal` profile and open the catalog. The Google warning is expected when
+`GOOGLE_CLIENT_ID` is empty and does not block password-based registration.
 ---
 
 ## 4. Payment Methods API
@@ -353,7 +495,7 @@ return 404. Canceled/overdue accounts must use subscription management instead.
 to browse, filter, search and view media details. Catalog endpoints require the
 server-side profile selection. Lists and suggestions apply the child-content
 restriction in SQL before pagination and rank preferred genres first; details
-use the shared content policy. Playback remains outside this module.
+use the shared content policy.
 `media.age_rating` accepts 0 (Livre), 10, 12, 14, 16, 18 or NULL.
 Child mode allows only explicitly classified Livre titles; unknown ratings are
 excluded. Content is filtered before ranking by preferred genres. If no eligible
@@ -369,3 +511,36 @@ apply both, along with the subscription and profile migrations. New databases
 already include all modules in `schema.sql`. Demo data in
 `backend/database/seeds/catalog_demo.sql` is unclassified and consequently hidden
 from child profiles until a rating is explicitly assigned.
+
+**Streaming integration (RF13–RF14).** The details page opens `player.html` for
+a movie or a specific series episode. Before returning a source, the API checks
+the bearer session, account eligibility, selected profile, episode ownership and
+the child-content restriction. HLS (`.m3u8`) and DASH (`.mpd`) sources use an
+adaptive browser player; ordinary files use the native HTML video element. The
+player provides pause/seek controls, saves the exact point every ten seconds and
+on pause/exit, and resumes independently for each profile. Completed content
+starts from the beginning on its next playback. Audio and subtitle choices are
+validated against `media_language`, applied to the manifest tracks and retained
+with the progress record. "Nenhuma" disables subtitles.
+
+API routes (all require an eligible account and selected profile):
+
+| Method | Route | Behavior |
+|---|---|---|
+| GET | `/api/streaming/{media_id}` | Authorize and prepare a movie session |
+| GET | `/api/streaming/{media_id}?episode_id={id}` | Prepare an episode session |
+| PUT | `/api/streaming/{media_id}/progress` | Save position/audio/subtitle; accepts the same optional episode query |
+
+For an existing database, apply the Module 5 migration after migration 004:
+
+```bash
+psql -h localhost -p 5432 -U postgres -d quaseflix \
+  -f backend/database/migrations/005_streaming.sql
+```
+
+Fresh databases already include `playback_progress` in `schema.sql`. For adaptive
+quality and selectable tracks, `movie.video_url`/`episode.video_url` should point
+to a CDN master manifest whose audio/text labels match the corresponding rows in
+`media_language`. The page loads the pinned Shaka Player 5.3.4 build from jsDelivr;
+MP4 playback remains available through the native fallback if that dependency is
+unavailable.
