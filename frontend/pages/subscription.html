@@ -1,28 +1,83 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Assinatura — QuaseFlix</title>
-<link rel="stylesheet" href="../styles/global.css"><link rel="stylesheet" href="../styles/auth.css">
-<style>[hidden]{display:none!important}label{display:block;margin:12px 0}table{width:100%;margin:20px 0}td,th{padding:8px;text-align:left}button{margin:8px 0}</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <title>Minha assinatura | QuaseFlix</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/pages-demo.css" />
+  <link rel="stylesheet" href="../styles/auth.css" />
+  <link rel="stylesheet" href="../styles/subscription.css" />
 </head>
-<body><main class="auth-main"><div class="auth-card">
-<h1>Minha assinatura</h1><p>Pagamentos e e-mails simulados. Nenhuma cobrança real.</p>
-<p id="message" role="status"></p>
-<form id="management-login">
-<p>Entre para gerenciar a assinatura, inclusive se estiver cancelada ou com débitos.</p>
-<label>E-mail<input class="form-input" type="email" name="email" required></label>
-<label>Senha<input class="form-input" type="password" name="password" required></label>
-<button class="btn btn-primary">Entrar</button></form>
-<section id="subscription" hidden>
-<p id="summary"></p><p id="outstanding"></p>
-<table><thead><tr><th>Valor</th><th>Vencimento</th><th>Situação</th></tr></thead><tbody id="invoices"></tbody></table>
-<label>Forma de pagamento<select class="form-input" id="payment-method"></select></label>
-<button id="add-boleto">Adicionar boleto simulado</button>
-<button id="pay">Confirmar pagamento simulado dos débitos</button>
-<button id="cancel">Cancelar assinatura</button>
-<button id="restore">Restaurar conta</button>
-<button id="logout">Sair</button>
-<p><a href="login.html">Voltar ao login</a></p>
-</section></div></main>
-<script src="../scripts/subscription.js"></script></body></html>
+<body>
+  <div class="auth-wrapper">
+    <header class="navbar">
+      <a href="../index.html" class="brand-logo" aria-label="Página inicial do QuaseFlix">QUASEFLIX</a>
+      <a href="./login.html" class="btn btn-secondary btn-sm">Voltar ao login</a>
+    </header>
+
+    <main class="auth-main subscription-main">
+      <div class="auth-card auth-card-wide">
+        <h1 class="auth-title">Minha assinatura</h1>
+        <p class="auth-subtitle">Consulte cobranças, pague débitos simulados ou restaure a sua conta.</p>
+        <p class="auth-note">Ambiente de demonstração: não há pagamentos nem cobranças reais.</p>
+        <p id="message" class="subscription-message" role="status" aria-live="polite"></p>
+
+        <form id="management-login" class="auth-form">
+          <p class="section-description">Entre com a conta do titular para gerenciar a assinatura, inclusive se ela estiver cancelada ou com débitos.</p>
+          <label class="form-group">
+            <span class="form-label">E-mail</span>
+            <input class="form-input" type="email" name="email" autocomplete="username" required />
+          </label>
+          <label class="form-group">
+            <span class="form-label">Senha</span>
+            <input class="form-input" type="password" name="password" autocomplete="current-password" required />
+          </label>
+          <button type="submit" class="btn btn-primary btn-lg btn-block">Entrar</button>
+        </form>
+
+        <section id="subscription" hidden aria-label="Dados da assinatura">
+          <div class="subscription-summary">
+            <p id="summary"></p>
+            <p id="outstanding"></p>
+          </div>
+
+          <h2 class="section-title">Cobranças</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Valor</th>
+                  <th scope="col">Vencimento</th>
+                  <th scope="col">Situação</th>
+                </tr>
+              </thead>
+              <tbody id="invoices"></tbody>
+            </table>
+          </div>
+
+          <label class="form-group payment-method-field">
+            <span class="form-label">Forma de pagamento</span>
+            <select class="form-input" id="payment-method"></select>
+          </label>
+
+          <div class="subscription-actions">
+            <button id="pay" type="button" class="btn btn-primary">Pagar débitos (simulação)</button>
+            <button id="add-boleto" type="button" class="btn btn-secondary">Adicionar boleto simulado</button>
+          </div>
+
+          <div class="account-actions">
+            <button id="restore" type="button" class="btn btn-primary">Restaurar assinatura</button>
+            <button id="cancel" type="button" class="btn btn-danger">Cancelar assinatura</button>
+            <button id="logout" type="button" class="btn btn-secondary">Sair da conta</button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="../scripts/pages-api.js"></script>
+  <script src="../scripts/subscription.js"></script>
+</body>
+</html>

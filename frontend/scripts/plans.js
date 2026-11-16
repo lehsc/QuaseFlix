@@ -24,14 +24,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Render options dynamically
     plansContainer.innerHTML = plans.map((plan, index) => `
-      <label style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.15rem; background-color: rgba(22, 22, 22, 0.9); border: 1px solid rgba(128, 128, 128, 0.5); border-radius: 4px; cursor: pointer; transition: border-color 0.2s;">
-        <input type="radio" name="selected-plan" value="${plan.id}" ${index === 0 ? "checked" : ""} style="margin-top: 0.2rem; accent-color: #e50914;" />
-        <div style="flex: 1;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
-            <strong style="font-size: 1.05rem; color: #fff;">${plan.name}</strong>
-            <span style="font-weight: 700; color: #e50914;">R$ ${plan.price.toFixed(2).replace('.', ',')}</span>
+      <label class="plan-option">
+        <input type="radio" name="selected-plan" value="${plan.id}" ${index === 0 ? "checked" : ""} />
+        <div class="plan-option-body">
+          <div class="plan-option-heading">
+            <strong>${plan.name}</strong>
+            <span class="plan-price">R$ ${plan.price.toFixed(2).replace('.', ',')}</span>
           </div>
-          <p style="font-size: 0.9rem; color: #b3b3b3; line-height: 1.4;">${plan.description || "Acesso completo ao catálogo."}</p>
+          <p>${plan.description || "Acesso completo ao catálogo."}</p>
         </div>
       </label>
     `).join("");

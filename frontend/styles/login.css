@@ -13,3 +13,7 @@
   border: 1px solid var(--color-brand-red);
   border-radius: var(--border-radius-sm);
 }
+
+.auth-footer p + p {
+  margin-top: 0.75rem;
+}

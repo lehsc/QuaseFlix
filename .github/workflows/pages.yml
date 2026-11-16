@@ -1,0 +1,60 @@
+name: GitHub Pages
+
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+      - "tests/test_github_pages.py"
+      - "tests/pages_api_smoke.js"
+      - ".github/workflows/pages.yml"
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - name: Validate the static site
+        run: python -m unittest tests.test_github_pages -v
+      - name: Exercise the browser-local API
+        run: node tests/pages_api_smoke.js
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: frontend
+          include-hidden-files: true
+      - name: Publish
+        id: deployment
+        uses: actions/deploy-pages@v5

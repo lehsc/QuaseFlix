@@ -22,6 +22,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const bankNameInput = document.getElementById("bank-name");
   const successBox = document.getElementById("payment-success");
   const successText = document.getElementById("payment-success-text");
+  const paymentError = document.getElementById("payment-error");
+
+  const showPaymentError = (message = "") => {
+    paymentError.textContent = message;
+    paymentError.hidden = !message;
+  };
 
   const getSelectedType = () => form.querySelector("input[name='payment-type']:checked").value;
 
@@ -47,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Show only the fields of the selected payment type
   const updateVisibleFields = () => {
+    showPaymentError();
     const isCard = getSelectedType() === "credit_card";
     cardFields.hidden = !isCard;
     boletoInfo.hidden = isCard;
@@ -179,6 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    showPaymentError();
 
     if (getSelectedType() === "credit_card" && !validateCardFields()) {
       return;
@@ -211,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } catch (error) {
       console.error("Payment method error:", error);
-      alert(error.message || "Não foi possível conectar ao servidor.");
+      showPaymentError(error.message || "Não foi possível conectar ao servidor.");
       if (submitButton) submitButton.disabled = false;
     }
   });

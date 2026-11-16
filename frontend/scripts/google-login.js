@@ -5,13 +5,13 @@ fetch("http://localhost:8000/api/registration/config")
   .then((response) => response.json())
   .then((config) => {
     if (!config.google_client_id) {
-      googleStatus.textContent = "Entrar com Google indisponível: configure GOOGLE_CLIENT_ID no servidor.";
+      googleStatus.textContent = "A opção de entrar com Google está indisponível no momento.";
       return;
     }
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
     script.onerror = () => {
-      googleStatus.textContent = "Não foi possível carregar o botão do Google.";
+      googleStatus.textContent = "Não foi possível carregar a opção de entrar com Google.";
     };
     script.onload = () => {
       google.accounts.id.initialize({
@@ -49,5 +49,5 @@ fetch("http://localhost:8000/api/registration/config")
     document.head.append(script);
   })
   .catch(() => {
-    googleStatus.textContent = "Não foi possível verificar a configuração do Google.";
+    googleStatus.textContent = "Não foi possível verificar a disponibilidade do login com Google.";
   });

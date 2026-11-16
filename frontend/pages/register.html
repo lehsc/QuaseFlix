@@ -1,80 +1,130 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cadastro QuaseFlix</title>
-<link rel="stylesheet" href="../styles/global.css">
-<link rel="stylesheet" href="../styles/auth.css">
-<style>[hidden]{display:none!important}label{display:block;margin:12px 0}.form-feedback,.field-error{color:#ffb3b3;margin:12px 0;line-height:1.4}.field-error{display:block;margin:4px 0 0}.form-input.input-error,.form-input.input-error:focus{border-color:#ff6969;box-shadow:0 0 0 1px #ff6969}.btn:disabled{opacity:.55;cursor:not-allowed}</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <title>QuaseFlix - Criar conta</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/pages-demo.css" />
+  <link rel="stylesheet" href="../styles/auth.css" />
+  <link rel="stylesheet" href="../styles/register.css" />
 </head>
 <body>
-<main class="auth-main">
-<div class="auth-card">
-<h1>Criar conta</h1>
-<p>Demonstração: e-mails e pagamentos simulados. Nenhuma cobrança real.</p>
-<p id="status" role="alert" class="form-feedback">
-</p>
-<form id="start">
-<label>E-mail<input name="email" type="email" required class="form-input">
-</label>
-<button type="submit" class="btn btn-primary btn-lg btn-block">Enviar código</button>
-</form>
-<div id="google">
-</div>
-<button id="google-unavailable" type="button" class="btn btn-primary btn-lg btn-block" disabled>Continuar com Google</button>
-<p id="google-status" class="form-feedback" role="status"></p>
-<form id="verify" hidden>
-<p>Consulte o código na caixa de saída local indicada no README.</p>
-<label>Código<input name="code" required pattern="[0-9]{6}" class="form-input">
-</label>
-<button type="submit" class="btn btn-primary btn-lg btn-block">Verificar</button>
-</form>
-<form id="complete" hidden>
-<label>Nome completo<input name="full_name" required class="form-input">
-</label>
-<label>Senha (10 caracteres, letras e números)<input name="password" type="password" minlength="10" maxlength="128" required class="form-input">
-</label>
-<label>CPF<input name="cpf" required class="form-input">
-</label>
-<label>Nascimento<input name="birth_date" type="date" required class="form-input">
-</label>
-<label>Telefone (opcional)<input name="phone" class="form-input">
-</label>
-<label>Endereço<input name="address" minlength="5" required class="form-input">
-</label>
-<label>Plano<select name="plan_id" required class="form-input">
-</select>
-</label>
-<p>Seu período gratuito de 30 dias começa ao finalizar.</p>
-<label>Pagamento<select name="type" class="form-input">
-<option value="boleto">Boleto simulado</option>
-<option value="credit_card">Cartão de teste</option>
-</select>
-</label>
-<fieldset id="card" hidden>
-<legend>Use somente dados de teste</legend>
-<label>Número<input name="card_number" class="form-input">
-</label>
-<label>Titular<input name="holder_name" class="form-input">
-</label>
-<label>CVC<input name="cvc" type="password" class="form-input">
-</label>
-<label>Mês<input name="expiration_month" type="number" min="1" max="12" class="form-input">
-</label>
-<label>Ano<input name="expiration_year" type="number" class="form-input">
-</label>
-</fieldset>
-<p id="complete-status" class="form-feedback" role="alert"></p>
-<button type="submit" class="btn btn-primary btn-lg btn-block">Finalizar cadastro</button>
-</form>
-<button id="restart" type="button" class="btn btn-secondary btn-lg btn-block">Recomeçar</button>
-<p>
-<a href="login.html">Entrar</a>
-</p>
-</div>
-</main>
-<script src="../scripts/register.js">
-</script>
+  <div class="auth-wrapper">
+    <header class="navbar">
+      <a href="../index.html" class="brand-logo" aria-label="Página inicial do QuaseFlix">QUASEFLIX</a>
+      <a href="./login.html" class="btn btn-secondary btn-sm">Entrar</a>
+    </header>
+
+    <main class="auth-main">
+      <div class="auth-card auth-card-wide">
+        <h1 class="auth-title">Criar conta</h1>
+        <p class="auth-subtitle">Comece seu período gratuito em poucos passos.</p>
+        <p class="auth-note">Este é um ambiente de demonstração. E-mails e pagamentos são simulados, sem cobrança real.</p>
+        <p id="status" role="alert" class="form-feedback"></p>
+
+        <form id="start" class="auth-form">
+          <label class="form-group">
+            <span class="form-label">E-mail</span>
+            <input name="email" type="email" required class="form-input" autocomplete="email" placeholder="seuemail@exemplo.com" />
+          </label>
+          <button type="submit" class="btn btn-primary btn-lg btn-block">Enviar código</button>
+        </form>
+
+        <div class="auth-divider" aria-hidden="true">ou</div>
+        <div id="google" class="google-button"></div>
+        <button id="google-unavailable" type="button" class="btn btn-secondary btn-lg btn-block" disabled>Continuar com Google</button>
+        <p id="google-status" class="form-feedback google-status" role="status"></p>
+
+        <form id="verify" class="auth-form registration-step" hidden>
+          <p class="step-description">Consulte o código gerado na caixa de saída local indicada no README.</p>
+          <label class="form-group">
+            <span class="form-label">Código de verificação</span>
+            <input name="code" required pattern="[0-9]{6}" inputmode="numeric" maxlength="6" autocomplete="one-time-code" class="form-input" />
+          </label>
+          <button type="submit" class="btn btn-primary btn-lg btn-block">Verificar código</button>
+        </form>
+
+        <form id="complete" class="auth-form registration-step" hidden>
+          <h2 class="step-title">Complete seus dados</h2>
+          <label class="form-group">
+            <span class="form-label">Nome completo</span>
+            <input name="full_name" required class="form-input" autocomplete="name" />
+          </label>
+          <label class="form-group">
+            <span class="form-label">Senha <span class="optional-tag">(mínimo de 10 caracteres, com letras e números)</span></span>
+            <input name="password" type="password" minlength="10" maxlength="128" required class="form-input" autocomplete="new-password" />
+          </label>
+          <div class="form-row">
+            <label class="form-group">
+              <span class="form-label">CPF</span>
+              <input name="cpf" required class="form-input" inputmode="numeric" autocomplete="off" />
+            </label>
+            <label class="form-group">
+              <span class="form-label">Data de nascimento</span>
+              <input name="birth_date" type="date" required class="form-input" autocomplete="bday" />
+            </label>
+          </div>
+          <label class="form-group">
+            <span class="form-label">Telefone <span class="optional-tag">(opcional)</span></span>
+            <input name="phone" class="form-input" inputmode="tel" autocomplete="tel" />
+          </label>
+          <label class="form-group">
+            <span class="form-label">Endereço</span>
+            <input name="address" minlength="5" required class="form-input" autocomplete="street-address" />
+          </label>
+          <label class="form-group">
+            <span class="form-label">Plano</span>
+            <select name="plan_id" required class="form-input"></select>
+          </label>
+          <p class="step-description">Seu período gratuito de 30 dias começa ao finalizar o cadastro.</p>
+          <label class="form-group">
+            <span class="form-label">Forma de pagamento</span>
+            <select name="type" class="form-input">
+              <option value="boleto">Boleto simulado</option>
+              <option value="credit_card">Cartão de teste</option>
+            </select>
+          </label>
+          <fieldset id="card" class="card-fields" hidden>
+            <legend>Dados do cartão de teste</legend>
+            <p class="step-description">Use somente dados fictícios.</p>
+            <label class="form-group">
+              <span class="form-label">Número do cartão</span>
+              <input name="card_number" class="form-input" inputmode="numeric" autocomplete="cc-number" />
+            </label>
+            <label class="form-group">
+              <span class="form-label">Nome do titular</span>
+              <input name="holder_name" class="form-input" autocomplete="cc-name" />
+            </label>
+            <div class="form-row">
+              <label class="form-group">
+                <span class="form-label">CVC</span>
+                <input name="cvc" type="password" class="form-input" inputmode="numeric" autocomplete="cc-csc" />
+              </label>
+              <label class="form-group">
+                <span class="form-label">Mês de validade</span>
+                <input name="expiration_month" type="number" min="1" max="12" class="form-input" autocomplete="cc-exp-month" />
+              </label>
+              <label class="form-group">
+                <span class="form-label">Ano de validade</span>
+                <input name="expiration_year" type="number" class="form-input" autocomplete="cc-exp-year" />
+              </label>
+            </div>
+          </fieldset>
+          <p id="complete-status" class="form-feedback" role="alert"></p>
+          <button type="submit" class="btn btn-primary btn-lg btn-block">Finalizar cadastro</button>
+        </form>
+
+        <div class="auth-footer register-footer">
+          <button id="restart" type="button" class="btn btn-secondary">Recomeçar cadastro</button>
+          <p>Já tem uma conta? <a href="./login.html" class="auth-link">Entrar</a></p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../scripts/pages-api.js"></script>
+  <script src="../scripts/register.js"></script>
 </body>
 </html>

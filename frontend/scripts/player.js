@@ -189,6 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
         status.textContent = "A fonte de vídeo não pôde ser carregada. Verifique o endereço da CDN e o formato do manifesto.";
       });
       content.hidden = false;
+      await (window.QuaseflixShakaReady || Promise.resolve(false));
       if (session.adaptive && window.shaka) {
         shaka.polyfill.installAll();
         if (!shaka.Player.isBrowserSupported()) throw new Error("Este navegador não oferece os recursos necessários para streaming adaptativo.");

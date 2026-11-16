@@ -114,7 +114,9 @@ function onSubmit(form, handler) {
 onSubmit(startForm, async (data) => {
   const result = await post("/start", { email: data.get("email") });
   saveRegistration(result.token, false);
-  statusText.textContent = "Código enviado para a caixa de saída local. Digite-o abaixo.";
+  statusText.textContent = result.demo_code
+    ? `Modo demonstração: use o código ${result.demo_code}.`
+    : "Código enviado. Consulte a caixa de saída local e digite-o abaixo.";
 });
 
 onSubmit(verifyForm, async (data) => {
@@ -189,13 +191,13 @@ fetch(`${API_BASE}/config`)
   .then((response) => response.json())
   .then((config) => {
     if (!config.google_client_id) {
-      googleStatus.textContent = "Entrar com Google indisponível: configure GOOGLE_CLIENT_ID no servidor.";
+      googleStatus.textContent = "A opção de continuar com Google está indisponível no momento.";
       return;
     }
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
     script.onerror = () => {
-      googleStatus.textContent = "Não foi possível carregar o botão do Google.";
+      googleStatus.textContent = "Não foi possível carregar a opção de continuar com Google.";
     };
     script.onload = () => {
       googleUnavailable.hidden = true;
@@ -224,7 +226,7 @@ fetch(`${API_BASE}/config`)
     document.head.append(script);
   })
   .catch(() => {
-    googleStatus.textContent = "Não foi possível verificar a configuração do Google.";
+    googleStatus.textContent = "Não foi possível verificar a disponibilidade do cadastro com Google.";
   });
 
 render();

@@ -4,6 +4,29 @@ const message = document.querySelector('#message');
 const login_form = document.querySelector('#management-login');
 const panel = document.querySelector('#subscription');
 
+const statusLabels = {
+  trial: 'Período gratuito',
+  active: 'Ativa',
+  canceled: 'Cancelada'
+};
+
+const errorLabels = {
+  'Select an owned, valid payment method.': 'Selecione uma forma de pagamento válida.',
+  'Settle outstanding invoices first.': 'Pague os débitos pendentes antes de continuar.',
+  'Account not found.': 'Conta não encontrada.',
+  'Choose a valid plan before billing.': 'Escolha um plano válido antes de continuar.'
+};
+
+function formatDate(value) {
+  if (!value) return 'não agendada';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat('pt-BR').format(date);
+}
+
+function formatPaymentType(type) {
+  return type === 'credit_card' ? 'Cartão de crédito' : type === 'boleto' ? 'Boleto' : type;
+}
+
 async function request(path = '', body) {
   const response = await fetch(api + path, {
     method: body === undefined ? 'GET' : 'POST',
@@ -13,7 +36,8 @@ async function request(path = '', body) {
   const data = await response.json();
   if (!response.ok) {
     if (response.status === 401) logout();
-    throw new Error(typeof data.detail === 'string' ? data.detail : 'Verifique os dados.');
+    const detail = typeof data.detail === 'string' ? data.detail : 'Verifique os dados informados.';
+    throw new Error(errorLabels[detail] || detail);
   }
   return data;
 }
@@ -27,13 +51,13 @@ async function refresh() {
   const data = await request();
   login_form.hidden = true;
   panel.hidden = false;
-  document.querySelector('#summary').textContent = `Situação: ${data.status}. Próxima cobrança: ${data.next_billing_at || 'não agendada'}.`;
-  document.querySelector('#outstanding').textContent = `Débitos: R$ ${Number(data.outstanding).toFixed(2)}`;
+  document.querySelector('#summary').textContent = `Situação: ${statusLabels[data.status] || data.status}. Próxima cobrança: ${formatDate(data.next_billing_at)}.`;
+  document.querySelector('#outstanding').textContent = `Débitos: R$ ${Number(data.outstanding).toFixed(2).replace('.', ',')}`;
   const table = document.querySelector('#invoices');
   table.replaceChildren();
   for (const invoice of data.invoices) {
     const row = table.insertRow();
-    for (const value of [Number(invoice.amount).toFixed(2), invoice.due_at, invoice.paid_at ? 'Pago' : 'Pendente']) row.insertCell().textContent = value;
+    for (const value of [`R$ ${Number(invoice.amount).toFixed(2).replace('.', ',')}`, formatDate(invoice.due_at), invoice.paid_at ? 'Pago' : 'Pendente']) row.insertCell().textContent = value;
     if (invoice.barcode && !invoice.paid_at) {
       const detail = table.insertRow().insertCell();
       detail.colSpan = 3;
@@ -46,7 +70,7 @@ async function refresh() {
   for (const method of data.payment_methods) {
     const option = document.createElement('option');
     option.value = method.id;
-    option.textContent = `${method.type} #${method.id}`;
+    option.textContent = `${formatPaymentType(method.type)} (cadastro ${method.id})`;
     select.append(option);
   }
   document.querySelector('#cancel').hidden = data.status === 'canceled';

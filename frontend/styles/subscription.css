@@ -1,0 +1,102 @@
+[hidden] {
+  display: none !important;
+}
+
+.subscription-main {
+  align-items: flex-start;
+}
+
+.subscription-message {
+  margin: 1rem 0;
+  color: #ffb3b8;
+  line-height: 1.5;
+}
+
+.subscription-message:empty {
+  display: none;
+}
+
+.section-description {
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.subscription-summary {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  line-height: 1.5;
+  background: rgba(255, 255, 255, 0.06);
+  border-left: 4px solid var(--color-brand-red);
+  border-radius: var(--border-radius-sm);
+}
+
+.section-title {
+  margin: 1.75rem 0 0.75rem;
+  font-size: 1.25rem;
+}
+
+.table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--border-radius-sm);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 480px;
+}
+
+th,
+td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+th {
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.payment-method-field {
+  margin-top: 1.5rem;
+}
+
+.subscription-actions,
+.account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.subscription-actions {
+  margin-top: 1rem;
+}
+
+.account-actions {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 540px) {
+  .subscription-actions,
+  .account-actions {
+    flex-direction: column;
+  }
+
+  .subscription-actions .btn,
+  .account-actions .btn {
+    width: 100%;
+  }
+}
