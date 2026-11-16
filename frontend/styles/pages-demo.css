@@ -1,0 +1,33 @@
+.pages-demo-banner {
+  align-items: center;
+  background: #172554;
+  color: #eff6ff;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: .875rem;
+  gap: .5rem 1rem;
+  justify-content: center;
+  padding: .65rem 1rem;
+  position: relative;
+  text-align: center;
+  z-index: 1000;
+}
+
+.pages-demo-banner span {
+  overflow-wrap: anywhere;
+}
+
+.pages-demo-banner button {
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: .25rem;
+  color: inherit;
+  cursor: pointer;
+  padding: .25rem .55rem;
+}
+
+.pages-demo-banner button:hover,
+.pages-demo-banner button:focus-visible {
+  background: #eff6ff;
+  color: #172554;
+}

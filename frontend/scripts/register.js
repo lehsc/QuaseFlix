@@ -114,7 +114,9 @@ function onSubmit(form, handler) {
 onSubmit(startForm, async (data) => {
   const result = await post("/start", { email: data.get("email") });
   saveRegistration(result.token, false);
-  statusText.textContent = "Código enviado. Consulte a caixa de saída local e digite-o abaixo.";
+  statusText.textContent = result.demo_code
+    ? `Modo demonstração: use o código ${result.demo_code}.`
+    : "Código enviado. Consulte a caixa de saída local e digite-o abaixo.";
 });
 
 onSubmit(verifyForm, async (data) => {

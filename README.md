@@ -2,6 +2,24 @@
 
 A full-stack streaming platform project featuring a FastAPI + PostgreSQL backend and a responsive frontend landing/authentication experience.
 
+## GitHub Pages demo
+
+The public demo is deployed automatically from `frontend/` after changes reach
+`main`: **https://lehsc.github.io/QuaseFlix/**
+
+Because GitHub Pages cannot run FastAPI or PostgreSQL, the published site uses a
+browser-local demo API. It supports login, registration, profiles, catalog,
+search, parental filtering, playback progress and subscription management
+without trying to connect to `localhost` on the visitor's computer. Demo data
+stays in `localStorage` and can be reset from the banner shown on the site.
+
+- Demo e-mail: `demo@quaseflix.com`
+- Demo password: `QuaseFlix123`
+- Registration verification code: `123456`
+
+Local development is unchanged: outside `*.github.io`, the frontend continues
+to use the FastAPI backend at `http://localhost:8000`.
+
 ---
 
 ## Prerequisites
