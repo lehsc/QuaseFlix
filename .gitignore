@@ -1,5 +1,11 @@
 venv/
 
+# Local configuration and generated development messages
+.env
+.env.*
+!.env.example
+/tmp/
+
 .vscode
 
 pytest.ini
