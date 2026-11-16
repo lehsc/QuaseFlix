@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Payload structured to match the backend BaseModel schemas / database 'account' table
     const accountPayload = {
       email: document.getElementById("email").value.trim(),
-      password_hash: document.getElementById("password").value,
+      password: document.getElementById("password").value,
       cpf: cpfInput.value.replace(/\D/g, ""),
       birth_date: document.getElementById("birth-date").value,
       phone: phoneInput.value.replace(/\D/g, "") || null,

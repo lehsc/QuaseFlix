@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuaseFlix - Escolha seu Plano</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/auth.css" />
+</head>
+<body>
+  <div class="auth-wrapper">
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <a href="../index.html" class="brand-logo" aria-label="Página inicial do QuaseFlix">
+        QUASEFLIX
+      </a>
+      <nav class="nav-actions">
+        <a href="./login.html" class="btn btn-primary btn-sm">Entrar</a>
+      </nav>
+    </header>
+
+    <!-- Plans Container -->
+    <main class="auth-main">
+      <div class="auth-card" style="max-width: 540px;">
+        <h1 class="auth-title">Escolha o seu plano</h1>
+        <p class="auth-subtitle">Selecione o plano ideal para assistir sem limites.</p>
+
+        <form id="plans-form" class="auth-form" novalidate>
+          <!-- Plans list loaded dynamically from backend -->
+          <div id="plans-container" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem;">
+            <!-- O conteúdo será injetado pelo JavaScript -->
+          </div>
+
+          <span class="error-message" id="plans-error"></span>
+
+          <button type="submit" class="btn btn-primary btn-lg btn-block">
+            Avançar para Pagamento
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="../scripts/plans.js"></script>
+</body>
+</html>

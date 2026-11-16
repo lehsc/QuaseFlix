@@ -1,11 +1,12 @@
 from backend.models.account import Account
 from backend.database.connection import get_db_connection
 
-def register_account(account: Account, plan_id = 1) -> bool:      
+def register_account(account: Account, plan_id = 1) -> int | None:
     query = """
         INSERT INTO public.account (
             email, password_hash, cpf, birth_date, phone, address, plan_id
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s);
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+        RETURNING id;
     """
         
     try:
@@ -23,8 +24,9 @@ def register_account(account: Account, plan_id = 1) -> bool:
                         plan_id                        
                     )
                 )
+                account_id = cursor.fetchone()[0]
         print(f"Conta {account.email} cadastrada com sucesso no banco de dados!")
-        return True
+        return account_id
     except Exception as e:
         print(f"Erro ao cadastrar conta: {e}")
-        return False
+        return None

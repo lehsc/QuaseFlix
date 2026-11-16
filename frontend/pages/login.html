@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuaseFlix - Entrar</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/auth.css" />
+  <link rel="stylesheet" href="../styles/login.css" />
+</head>
+<body>
+  <div class="auth-wrapper">
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <a href="../index.html" class="brand-logo" aria-label="Página inicial do QuaseFlix">
+        QUASEFLIX
+      </a>
+    </header>
+
+    <!-- Login Form Container -->
+    <main class="auth-main">
+      <div class="auth-card">
+        <h1 class="auth-title">Entrar</h1>
+        <p class="auth-subtitle">Use o e-mail e a senha da sua conta para continuar.</p>
+
+        <form id="login-form" class="auth-form" novalidate>
+          <!-- Errors of the whole form (wrong password, canceled account, ...) -->
+          <p id="login-error" class="form-alert" role="alert" hidden></p>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email" class="form-label">E-mail</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              placeholder="seuemail@exemplo.com"
+              autocomplete="username"
+              required
+            />
+            <span class="error-message" id="email-error"></span>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label for="password" class="form-label">Senha</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-input"
+              placeholder="Sua senha"
+              autocomplete="current-password"
+              required
+            />
+            <span class="error-message" id="password-error"></span>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg btn-block">
+            Entrar
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          <p>Novo por aqui? <a href="./register.html" class="auth-link">Assine agora</a>.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../scripts/session.js"></script>
+  <script src="../scripts/login.js"></script>
+</body>
+</html>

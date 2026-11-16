@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuaseFlix - Forma de Pagamento</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/auth.css" />
+  <link rel="stylesheet" href="../styles/payment.css" />
+</head>
+<body>
+  <div class="auth-wrapper">
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <a href="../index.html" class="brand-logo" aria-label="Página inicial do QuaseFlix">
+        QUASEFLIX
+      </a>
+      <nav class="nav-actions">
+        <a href="./login.html" class="btn btn-primary btn-sm">Entrar</a>
+      </nav>
+    </header>
+
+    <!-- Payment Method Container -->
+    <main class="auth-main">
+      <div class="auth-card">
+        <h1 class="auth-title">Forma de pagamento</h1>
+        <p class="auth-subtitle">Escolha como você quer pagar a sua assinatura.</p>
+
+        <form id="payment-form" class="auth-form" novalidate>
+          <!-- Payment type -->
+          <div class="payment-options" role="radiogroup" aria-label="Forma de pagamento">
+            <label class="payment-option">
+              <input type="radio" name="payment-type" value="credit_card" checked />
+              <span class="payment-option-body">Cartão de crédito</span>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="payment-type" value="boleto" />
+              <span class="payment-option-body">Boleto</span>
+            </label>
+          </div>
+
+          <!-- Credit card fields -->
+          <div id="credit-card-fields" class="payment-fields">
+            <div class="form-group">
+              <label for="card-number" class="form-label">Número do cartão *</label>
+              <input
+                type="text"
+                id="card-number"
+                name="card_number"
+                class="form-input"
+                placeholder="0000 0000 0000 0000"
+                inputmode="numeric"
+                autocomplete="cc-number"
+                maxlength="23"
+              />
+              <span class="error-message" id="card-number-error"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="holder-name" class="form-label">Nome impresso no cartão *</label>
+              <input
+                type="text"
+                id="holder-name"
+                name="holder_name"
+                class="form-input"
+                placeholder="Como aparece no cartão"
+                autocomplete="cc-name"
+                maxlength="100"
+              />
+              <span class="error-message" id="holder-name-error"></span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="expiry" class="form-label">Validade *</label>
+                <input
+                  type="text"
+                  id="expiry"
+                  name="expiry"
+                  class="form-input"
+                  placeholder="MM/AA"
+                  inputmode="numeric"
+                  autocomplete="cc-exp"
+                  maxlength="5"
+                />
+                <span class="error-message" id="expiry-error"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="cvc" class="form-label">Código de segurança *</label>
+                <input
+                  type="password"
+                  id="cvc"
+                  name="cvc"
+                  class="form-input"
+                  placeholder="CVC"
+                  inputmode="numeric"
+                  autocomplete="cc-csc"
+                  maxlength="4"
+                />
+                <span class="error-message" id="cvc-error"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="bank-name" class="form-label">Banco <span class="optional-tag">(opcional)</span></label>
+              <input
+                type="text"
+                id="bank-name"
+                name="bank_name"
+                class="form-input"
+                placeholder="Banco emissor do cartão"
+                maxlength="50"
+              />
+            </div>
+          </div>
+
+          <!-- Boleto info -->
+          <p id="boleto-info" class="payment-note" hidden>
+            O boleto será gerado assim que você confirmar.
+          </p>
+
+          <button type="submit" class="btn btn-primary btn-lg btn-block">
+            Confirmar
+          </button>
+        </form>
+
+        <!-- Shown after the payment method is registered -->
+        <section id="payment-success" class="payment-success" aria-live="polite" hidden>
+          <h2 class="payment-success-title">Forma de pagamento cadastrada</h2>
+          <p id="payment-success-text" class="payment-success-text"></p>
+          <a href="./login.html" class="btn btn-primary btn-lg btn-block">Continuar</a>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="../scripts/payment.js"></script>
+</body>
+</html>
