@@ -44,6 +44,10 @@
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75);
 }
 
+.auth-card-wide {
+  max-width: 680px;
+}
+
 .auth-title {
   font-size: 2rem;
   font-weight: 700;
@@ -54,6 +58,24 @@
   color: var(--color-text-secondary);
   font-size: 0.95rem;
   margin-bottom: 1.75rem;
+  line-height: 1.4;
+}
+
+.auth-note {
+  padding: 0.85rem 1rem;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  background: rgba(255, 255, 255, 0.06);
+  border-left: 3px solid var(--color-brand-red);
+  border-radius: var(--border-radius-sm);
+}
+
+.form-feedback {
+  min-height: 1.35rem;
+  margin: 1rem 0;
+  color: #ffb3b8;
+  font-size: 0.9rem;
   line-height: 1.4;
 }
 
@@ -121,7 +143,7 @@
 
 .error-message {
   font-size: 0.8rem;
-  color: #eb3942;
+  color: #ff8a90;
   min-height: 1rem;
 }
 
@@ -149,6 +171,24 @@
   text-decoration: underline;
 }
 
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  flex: 1;
+  height: 1px;
+  content: "";
+  background: rgba(255, 255, 255, 0.15);
+}
+
 /* Responsive Adjustments */
 @media (max-width: 540px) {
   .auth-card {
@@ -170,4 +210,68 @@
 
 .btn-secondary:hover {
   background: rgba(255, 255, 255, 0.12);
+}
+
+.plans-card {
+  max-width: 540px;
+}
+
+.plans-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.plan-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.15rem;
+  background-color: rgba(22, 22, 22, 0.9);
+  border: 1px solid rgba(128, 128, 128, 0.5);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.plan-option:hover,
+.plan-option:has(input:checked) {
+  background-color: rgba(40, 40, 40, 0.95);
+  border-color: var(--color-brand-red);
+}
+
+.plan-option input {
+  margin-top: 0.25rem;
+  accent-color: var(--color-brand-red);
+}
+
+.plan-option-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.plan-option-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.plan-option-heading strong {
+  color: var(--color-text-primary);
+  font-size: 1.05rem;
+}
+
+.plan-price {
+  color: #ff777e;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.plan-option p {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.4;
 }

@@ -3,6 +3,16 @@
   display: none !important;
 }
 
+.form-alert {
+  padding: 0.85rem 1rem;
+  color: #ffb3b8;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  background-color: rgba(229, 9, 20, 0.12);
+  border: 1px solid var(--color-brand-red);
+  border-radius: var(--border-radius-sm);
+}
+
 /* Payment type selector (radio buttons styled as two options) */
 .payment-options {
   display: grid;
