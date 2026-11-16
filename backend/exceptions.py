@@ -49,3 +49,19 @@ class MediaNotFoundError(Exception):
     def __init__(self, media_id: int):
         super().__init__(f"Media {media_id} not found.")
         self.media_id = media_id
+
+
+class EpisodeRequiredError(Exception):
+    """Raised when a series playback request does not identify an episode."""
+
+    def __init__(self, media_id: int):
+        super().__init__(f"Select an episode of series {media_id} to start playback.")
+        self.media_id = media_id
+
+
+class PlaybackOptionError(Exception):
+    """Raised when an audio or subtitle choice is not available for a work."""
+
+    def __init__(self, option: str):
+        super().__init__(f"Playback option is not available: {option}.")
+        self.option = option

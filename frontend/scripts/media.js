@@ -27,6 +27,9 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("media-type").textContent = media.media_type === "movie" ? "Filme" : "Série";
       document.getElementById("media-title").textContent = media.title;
       document.getElementById("media-synopsis").textContent = media.synopsis || "Sinopse não informada.";
+      const watch = document.getElementById("watch-media");
+      watch.hidden = media.media_type !== "movie";
+      watch.href = `./player.html?id=${media.id}`;
       metadata.replaceChildren();
       addMetadata("Ano de produção", media.release_year ?? "Não informado");
       addMetadata("Gêneros", list(media.genres));
@@ -53,6 +56,9 @@ document.addEventListener("DOMContentLoaded", () => {
             item.value = episode.episode_number;
             item.append(element("h4", episode.title),
               element("p", `${episode.duration_minutes} min · Direção: ${episode.director || "Não informada"}`, "muted"));
+            const play = element("a", "Assistir episódio", "btn btn-primary btn-sm");
+            play.href = `./player.html?id=${media.id}&episode_id=${episode.id}`;
+            item.append(play);
             episodes.append(item);
           });
           section.append(episodes);

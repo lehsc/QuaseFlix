@@ -1,0 +1,23 @@
+[hidden] { display: none !important; }
+body { height: auto; min-height: 100vh; }
+.player-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem 5%; }
+.brand-logo { color: var(--color-brand-red); font-size: 1.7rem; font-weight: 900; letter-spacing: -.06em; }
+.player-header nav { display: flex; align-items: center; gap: 1.25rem; }
+.player-main { width: min(1400px, 100%); margin: auto; padding: 1rem 5% 3rem; }
+#subscription-link { margin: 1rem 0; }
+.title-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; margin-bottom: 1rem; }
+.eyebrow { color: #ff777e; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
+h1 { margin-top: .35rem; font-size: clamp(1.5rem, 4vw, 2.4rem); }
+.btn-secondary { background: #333; color: white; }
+.video-shell { background: #080808; border: 1px solid #2e2e2e; aspect-ratio: 16 / 9; display: grid; place-items: center; }
+video { width: 100%; height: 100%; background: black; }
+.playback-settings { display: grid; grid-template-columns: repeat(2, minmax(180px, 280px)) 1fr; align-items: end; gap: 1rem; padding: 1rem; background: var(--color-bg-secondary); border: 1px solid #333; }
+.playback-settings > div { display: grid; gap: .5rem; }
+select { min-height: 44px; padding: .65rem; color: white; background: #202020; border: 1px solid #777; border-radius: 4px; font: inherit; }
+.muted { color: var(--color-text-secondary); }
+:focus-visible { outline: 3px solid white; outline-offset: 3px; }
+@media (max-width: 700px) {
+  .player-header, .title-row { align-items: flex-start; }
+  .player-header nav, .title-row { flex-wrap: wrap; justify-content: flex-end; }
+  .playback-settings { grid-template-columns: 1fr; }
+}

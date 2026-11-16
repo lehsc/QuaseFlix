@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reprodução | QuaseFlix</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/player.css" />
+</head>
+<body>
+  <header class="player-header">
+    <a class="brand-logo" href="./catalog.html">QUASEFLIX</a>
+    <nav aria-label="Navegação do reprodutor">
+      <a id="back-to-title" href="./catalog.html">Voltar para a obra</a>
+      <button type="button" id="btn-logout" class="btn btn-primary btn-sm">Sair</button>
+    </nav>
+  </header>
+  <main class="player-main">
+    <p id="player-status" role="status" aria-live="polite">Preparando reprodução…</p>
+    <a id="subscription-link" class="btn btn-primary btn-sm" href="./subscription.html" hidden>Gerenciar assinatura</a>
+    <section id="player-content" hidden>
+      <div class="title-row">
+        <div>
+          <p id="content-kind" class="eyebrow"></p>
+          <h1 id="content-title"></h1>
+        </div>
+        <button id="toggle-settings" class="btn btn-secondary btn-sm" type="button"
+                aria-expanded="false" aria-controls="playback-settings">Áudio e legendas</button>
+      </div>
+      <div class="video-shell">
+        <video id="video" controls preload="metadata" playsinline
+               controlslist="nodownload" disablepictureinpicture></video>
+      </div>
+      <form id="playback-settings" class="playback-settings" hidden>
+        <div>
+          <label for="audio-language">Áudio</label>
+          <select id="audio-language"></select>
+        </div>
+        <div>
+          <label for="subtitle-language">Legenda</label>
+          <select id="subtitle-language"><option value="">Nenhuma</option></select>
+        </div>
+        <p id="track-status" class="muted" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+  <script src="../scripts/session.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/shaka-player@5.3.4/dist/shaka-player.compiled.min.js"></script>
+  <script src="../scripts/player.js"></script>
+</body>
+</html>
