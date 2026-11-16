@@ -27,16 +27,12 @@ def registered_account():
     client = TestClient(app)
     random_cpf = "".join([str(random.randint(0, 9)) for _ in range(11)])
     email = f"user_{uuid.uuid4().hex[:8]}@quaseflix-test.com"
-    response = client.post("/api/accounts/", json = {
-        "email": email,
-        "password": TEST_PASSWORD,
-        "cpf": random_cpf,
-        "birth_date": "2000-05-15",
-        "phone": "31999998888",
-        "address": "Avenida Antonio Carlos, 6627",
-    })
-    assert response.status_code == HTTPStatus.CREATED
-    new_account_id = response.json()["id"]
+    from backend.models.account import Account
+    from backend.security import hash_password
+    from backend.services.account_services import register_account
+    from datetime import date
+    new_account_id = register_account(Account(email, hash_password(TEST_PASSWORD), random_cpf, date(2000,5,15), "31999998888", "Test address"))
+    assert new_account_id
 
     yield {"id": new_account_id, "email": email, "password": TEST_PASSWORD}
 

@@ -1,148 +1,83 @@
-/**
- * Registration form formatting, validation, and submission handler
- */
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("register-form");
-  const cpfInput = document.getElementById("cpf");
-  const phoneInput = document.getElementById("phone");
+const api = "http://localhost:8000/api/registration";
 
-  // Format CPF as 000.000.000-00
-  cpfInput.addEventListener("input", (event) => {
-    let value = event.target.value.replace(/\D/g, "").slice(0, 11);
-    value = value.replace(/(\d{3})(\d)/, "$1.$2");
-    value = value.replace(/(\d{3})(\d)/, "$1.$2");
-    value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-    event.target.value = value;
-  });
+const start_form = document.querySelector("#start"), verify_form = document.querySelector("#verify"), complete_form = document.querySelector("#complete"), status_text = document.querySelector("#status");
 
-  // Format Phone as (00) 00000-0000
-  phoneInput.addEventListener("input", (event) => {
-    let value = event.target.value.replace(/\D/g, "").slice(0, 11);
-    if (value.length > 2) {
-      value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
-    }
-    if (value.length > 10) {
-      value = `${value.slice(0, 10)}-${value.slice(10)}`;
-    }
-    event.target.value = value;
-  });
+let token = sessionStorage.getItem("registration_token"), verified = sessionStorage.getItem("registration_verified") === "yes";
 
-  // Helper to toggle field error state
-  const setFieldError = (inputId, errorId, message) => {
-    const input = document.getElementById(inputId);
-    const errorSpan = document.getElementById(errorId);
-    if (message) {
-      input.classList.add("input-error");
-      errorSpan.textContent = message;
-    } else {
-      input.classList.remove("input-error");
-      errorSpan.textContent = "";
-    }
-  };
+function render() { start_form.hidden = !!token;
+ verify_form.hidden = !token || verified;
+ complete_form.hidden = !verified;
+ }
+async function request(path, data) { const response = await fetch(api + path, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+ const result = await response.json();
+ if (!response.ok) throw new Error(typeof result.detail === "string" ? result.detail : "Verifique os campos informados.");
+ return result;
+ }
+function save(value, confirmed) { token=value;
+ verified=confirmed;
+ sessionStorage.setItem("registration_token",token);
+ sessionStorage.setItem("registration_verified",confirmed?"yes":"no");
+ render();
+ }
+function submit(form, callback) { form.addEventListener("submit",async event=>{event.preventDefault();
+ const button=form.querySelector("button");
+ button.disabled=true;
+ status_text.textContent="";
+ try { await callback(new FormData(form));
+ } catch(error) { status_text.textContent=error.message;
+ } finally { button.disabled=false;
+ } });
+ }
+submit(start_form,async data=>{ const result=await request("/start",{email:data.get("email")});
+save(result.token,false);
+ });
 
-  // Validate form fields before submission
-  const validateForm = () => {
-    let isValid = true;
-
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-    const cpfDigits = cpfInput.value.replace(/\D/g, "");
-    const birthDate = document.getElementById("birth-date").value;
-    const address = document.getElementById("address").value.trim();
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setFieldError("email", "email-error", "Informe um endereço de e-mail válido.");
-      isValid = false;
-    } else {
-      setFieldError("email", "email-error", "");
-    }
-
-    // Password validation
-    if (password.length < 6) {
-      setFieldError("password", "password-error", "A senha deve ter pelo menos 6 caracteres.");
-      isValid = false;
-    } else {
-      setFieldError("password", "password-error", "");
-    }
-
-    // CPF length validation
-    if (cpfDigits.length !== 11) {
-      setFieldError("cpf", "cpf-error", "Informe um CPF válido com 11 dígitos.");
-      isValid = false;
-    } else {
-      setFieldError("cpf", "cpf-error", "");
-    }
-
-    // Birth date validation
-    if (!birthDate) {
-      setFieldError("birth-date", "birth-date-error", "Informe sua data de nascimento.");
-      isValid = false;
-    } else {
-      setFieldError("birth-date", "birth-date-error", "");
-    }
-
-    // Address validation
-    if (address.length < 5) {
-      setFieldError("address", "address-error", "Informe seu endereço completo.");
-      isValid = false;
-    } else {
-      setFieldError("address", "address-error", "");
-    }
-
-    return isValid;
-  };
-
-  // Handle form submission
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    // Payload structured to match the backend BaseModel schemas / database 'account' table
-    const accountPayload = {
-      email: document.getElementById("email").value.trim(),
-      password: document.getElementById("password").value,
-      cpf: cpfInput.value.replace(/\D/g, ""),
-      birth_date: document.getElementById("birth-date").value,
-      phone: phoneInput.value.replace(/\D/g, "") || null,
-      address: document.getElementById("address").value.trim()
-    };
-
-    const submitButton = form.querySelector("button[type='submit']");
-    
-    try {
-      if (submitButton) submitButton.disabled = true;
-
-      // Send data to FastAPI backend endpoint
-      const response = await fetch("http://localhost:8000/api/accounts/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(accountPayload)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || "Erro ao realizar o cadastro. Verifique os dados inseridos.");
-      }
-
-      const result = await response.json();
-
-      // Store account ID in sessionStorage for the next step (plans)
-      sessionStorage.setItem("quaseflix_account_id", result.id);
-
-      // Proceed to plan selection page
-      window.location.href = "./plans.html";
-
-    } catch (error) {
-      console.error("Registration error:", error);
-      alert(error.message || "Não foi possível conectar ao servidor.");
-      if (submitButton) submitButton.disabled = false;
-    }
-  });
+submit(verify_form,async data=>{await request("/verify",{token,code:data.get("code")});
+save(token,true);
 });
+
+complete_form.elements.type.addEventListener("change",()=>{document.querySelector("#card").hidden=complete_form.elements.type.value!=="credit_card";
+});
+
+submit(complete_form,async data=>{const payload=Object.fromEntries(data);
+ payload.token=token;
+ payload.plan_id=Number(payload.plan_id);
+payload.phone=payload.phone||null;
+payload.payment={type:payload.type};
+if(payload.type==="credit_card") { for(const key of ["card_number","holder_name","cvc","expiration_month","expiration_year"])payload.payment[key]=key.startsWith("expiration_")?Number(payload[key]):payload[key];
+ } for(const key of ["type","card_number","holder_name","cvc","expiration_month","expiration_year"])delete payload[key];
+await request("/complete",payload);
+sessionStorage.removeItem("registration_token");
+sessionStorage.removeItem("registration_verified");
+location.href="login.html";
+});
+
+document.querySelector("#restart").onclick=()=>{sessionStorage.removeItem("registration_token");
+sessionStorage.removeItem("registration_verified");
+location.reload();
+};
+
+fetch("http://localhost:8000/api/plans").then(r=>{if(!r.ok)throw new Error("Não foi possível carregar planos.");
+return r.json();
+}).then(plans=>{for(const plan of plans){const option=document.createElement("option");
+option.value=plan.id;
+option.textContent=`${plan.name} — R$ ${Number(plan.price).toFixed(2)}`;
+complete_form.elements.plan_id.append(option);
+}}).catch(e=>status_text.textContent=e.message);
+
+fetch(api+"/config").then(r=>r.json()).then(config=>{if(!config.google_client_id)return;
+const script=document.createElement("script");
+script.src="https://accounts.google.com/gsi/client";
+script.onload=()=>{google.accounts.id.initialize({client_id:config.google_client_id,callback:async response=>{try{const result=await request("/google",{credential:response.credential});
+if(result.access_token){sessionStorage.setItem("quaseflix_token",result.access_token);
+sessionStorage.setItem("quaseflix_account",JSON.stringify(result.account));
+location.href="profiles.html";
+}else{save(result.token,true);
+}}catch(error){status_text.textContent=error.message;
+}}});
+google.accounts.id.renderButton(document.querySelector("#google"),{theme:"outline",size:"large"});
+};
+document.head.append(script);
+});
+
+render();

@@ -5,9 +5,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const API_BASE_URL = "http://localhost:8000";
 
   // Verify if account ID exists in session
-  const accountId = sessionStorage.getItem("quaseflix_account_id");
+  const accountId = JSON.parse(sessionStorage.getItem("quaseflix_account") || "null")?.id;
   if (!accountId) {
-    window.location.href = "./register.html";
+    window.location.href = "./login.html";
     return;
   }
 
@@ -61,7 +61,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       const response = await fetch(`${API_BASE_URL}/api/accounts/${accountId}/plan`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${sessionStorage.getItem("quaseflix_token") || ""}`
         },
         body: JSON.stringify({ plan_id: planId })
       });

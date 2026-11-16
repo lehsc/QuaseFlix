@@ -1,128 +1,77 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>QuaseFlix - Criar Conta</title>
-  <link rel="stylesheet" href="../styles/global.css" />
-  <link rel="stylesheet" href="../styles/auth.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cadastro QuaseFlix</title>
+<link rel="stylesheet" href="../styles/global.css">
+<link rel="stylesheet" href="../styles/auth.css">
+<style>[hidden]{display:none!important}label{display:block;margin:12px 0}</style>
 </head>
 <body>
-  <div class="auth-wrapper">
-    <!-- Top Navigation Bar -->
-    <header class="navbar">
-      <a href="../index.html" class="brand-logo" aria-label="Página inicial do QuaseFlix">
-        QUASEFLIX
-      </a>
-      <nav class="nav-actions">
-        <a href="./login.html" class="btn btn-primary btn-sm">Entrar</a>
-      </nav>
-    </header>
-
-    <!-- Registration Form Container -->
-    <main class="auth-main">
-      <div class="auth-card">
-        <h1 class="auth-title">Crie a sua conta</h1>
-        <p class="auth-subtitle">Preencha seus dados abaixo para começar sua assinatura.</p>
-
-        <form id="register-form" class="auth-form" novalidate>
-          <!-- Email -->
-          <div class="form-group">
-            <label for="email" class="form-label">E-mail *</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              class="form-input"
-              placeholder="seuemail@exemplo.com"
-              required
-            />
-            <span class="error-message" id="email-error"></span>
-          </div>
-
-          <!-- Password -->
-          <div class="form-group">
-            <label for="password" class="form-label">Senha *</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              class="form-input"
-              placeholder="Mínimo de 6 caracteres"
-              minlength="6"
-              required
-            />
-            <span class="error-message" id="password-error"></span>
-          </div>
-
-          <!-- Two-column row for CPF and Birth Date -->
-          <div class="form-row">
-            <div class="form-group">
-              <label for="cpf" class="form-label">CPF *</label>
-              <input
-                type="text"
-                id="cpf"
-                name="cpf"
-                class="form-input"
-                placeholder="000.000.000-00"
-                maxlength="14"
-                required
-              />
-              <span class="error-message" id="cpf-error"></span>
-            </div>
-
-            <div class="form-group">
-              <label for="birth-date" class="form-label">Data de nascimento *</label>
-              <input
-                type="date"
-                id="birth-date"
-                name="birth_date"
-                class="form-input"
-                required
-              />
-              <span class="error-message" id="birth-date-error"></span>
-            </div>
-          </div>
-
-          <!-- Phone (Optional) -->
-          <div class="form-group">
-            <label for="phone" class="form-label">Telefone <span class="optional-tag">(opcional)</span></label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              class="form-input"
-              placeholder="(31) 99999-9999"
-              maxlength="15"
-            />
-          </div>
-
-          <!-- Address -->
-          <div class="form-group">
-            <label for="address" class="form-label">Endereço completo *</label>
-            <input
-              type="text"
-              id="address"
-              name="address"
-              class="form-input"
-              placeholder="Rua, número, bairro, cidade - UF"
-              required
-            />
-            <span class="error-message" id="address-error"></span>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-lg btn-block">
-            Continuar
-          </button>
-        </form>
-
-        <div class="auth-footer">
-          <p>Já possui uma conta? <a href="./login.html" class="auth-link">Entrar agora</a>.</p>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <script src="../scripts/register.js"></script>
+<main class="auth-main">
+<div class="auth-card">
+<h1>Criar conta</h1>
+<p>Demonstração: e-mails e pagamentos simulados. Nenhuma cobrança real.</p>
+<p id="status" role="status">
+</p>
+<form id="start">
+<label>E-mail<input name="email" type="email" required class="form-input">
+</label>
+<button class="btn btn-primary">Enviar código</button>
+</form>
+<div id="google">
+</div>
+<form id="verify" hidden>
+<p>Consulte o código na caixa de saída local indicada no README.</p>
+<label>Código<input name="code" required pattern="[0-9]{6}" class="form-input">
+</label>
+<button class="btn btn-primary">Verificar</button>
+</form>
+<form id="complete" hidden>
+<label>Nome completo<input name="full_name" required class="form-input">
+</label>
+<label>Senha (10 caracteres, letras e números)<input name="password" type="password" minlength="10" maxlength="128" required class="form-input">
+</label>
+<label>CPF<input name="cpf" required class="form-input">
+</label>
+<label>Nascimento<input name="birth_date" type="date" required class="form-input">
+</label>
+<label>Telefone (opcional)<input name="phone" class="form-input">
+</label>
+<label>Endereço<input name="address" minlength="5" required class="form-input">
+</label>
+<label>Plano<select name="plan_id" required class="form-input">
+</select>
+</label>
+<p>Seu período gratuito de 30 dias começa ao finalizar.</p>
+<label>Pagamento<select name="type" class="form-input">
+<option value="boleto">Boleto simulado</option>
+<option value="credit_card">Cartão de teste</option>
+</select>
+</label>
+<fieldset id="card" hidden>
+<legend>Use somente dados de teste</legend>
+<label>Número<input name="card_number" class="form-input">
+</label>
+<label>Titular<input name="holder_name" class="form-input">
+</label>
+<label>CVC<input name="cvc" type="password" class="form-input">
+</label>
+<label>Mês<input name="expiration_month" type="number" min="1" max="12" class="form-input">
+</label>
+<label>Ano<input name="expiration_year" type="number" class="form-input">
+</label>
+</fieldset>
+<button class="btn btn-primary">Finalizar cadastro</button>
+</form>
+<button id="restart" type="button">Recomeçar</button>
+<p>
+<a href="login.html">Entrar</a>
+</p>
+</div>
+</main>
+<script src="../scripts/register.js">
+</script>
 </body>
 </html>

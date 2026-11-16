@@ -199,3 +199,31 @@ To debug tests with breakpoints in VS Code, ensure your `.vscode/launch.json` in
 }
 ```
 > **Note:** Since `email` and `cpf` have `UNIQUE` constraints in `public.account`, clear test rows between repeated test runs if your test uses static values.
+
+## Verified registration (RF01–RF03)
+
+Install `pip install -r requirements.txt`. Existing databases must apply
+`backend/database/migrations/002_registration.sql` before starting the server.
+Resolve any existing email duplicates differing only in case before applying it.
+Fresh databases use the updated schema. Seed plan 1 as described above.
+
+Open `frontend/pages/register.html` through a local HTTP server. Email delivery
+and payments are simulated: never use real card details. Messages appear as JSON
+files in `/tmp/quaseflix-outbox`, configurable with `QUASEFLIX_OUTBOX`.
+Codes expire after 30 minutes and allow five attempts. Reloading the same tab
+preserves registration progress; expired sessions require restarting. Account,
+plan and payment details are committed together only after verified completion.
+The existing account creation endpoint now returns 410. Existing plan/payment
+mutation endpoints require an authenticated owner.
+
+Passwords require 10–128 characters including letters and numbers; CPF check
+digits, full name, address length and birth date are validated server-side.
+Phone is optional. Trial starts at final account creation.
+
+For Google registration, configure `GOOGLE_CLIENT_ID` in the server environment
+and authorize the frontend origin in Google Cloud. Tokens are verified using
+Google's authentication library. Existing email accounts are never automatically
+linked; they must use password login. A Google registrant can use Google again or the local password for login. No Google client ID or credentials are included here.
+
+The development outbox is for local demonstrations only. It is not an email
+service. Payment details are validation-only, with no provider charge or token.
