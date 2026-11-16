@@ -128,7 +128,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || "Erro ao realizar o cadastro. Verifique os dados inseridos.");
+        const detail = errorData?.detail;
+        const fallback = "Erro ao realizar o cadastro. Verifique os dados inseridos.";
+        const fieldLabels = {
+          email: "E-mail", password: "Senha", cpf: "CPF",
+          birth_date: "Data de nascimento", phone: "Telefone", address: "Endereço"
+        };
+        // FastAPI validation errors contain a list of objects, not a string.
+        const messages = Array.isArray(detail) ? detail
+          .filter(item => item && typeof item.msg === "string")
+          .map(item => {
+            const field = Array.isArray(item.loc) ? item.loc[1] : null;
+            const label = fieldLabels[field];
+            return label ? `${label}: ${item.msg}` : item.msg;
+          }) : [];
+        const message = typeof detail === "string" && detail.trim()
+          ? detail : messages.join("\n") || fallback;
+        throw new Error(message);
       }
 
       const result = await response.json();

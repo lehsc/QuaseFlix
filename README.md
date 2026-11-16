@@ -34,21 +34,26 @@ QuaseFlix/
 │   │   └── payment_type.py      # PaymentType enum
 │   ├── schemas/
 │   │   ├── account_schema.py    # Pydantic request schemas
-│   │   └── payment_method_schema.py
+│   │   ├── payment_method_schema.py
+│   │   └── catalog_schema.py    # Catalog & media detail response schemas
 │   ├── routers/
 │   │   ├── accounts.py          # Account API endpoints
-│   │   └── payment_methods.py   # Payment method API endpoints
+│   │   ├── payment_methods.py   # Payment method API endpoints
+│   │   └── catalog.py           # Catalog, search & media detail API endpoints
 │   └── services/
 │       ├── account_services.py  # Business logic & SQL queries
-│       └── payment_method_services.py
+│       ├── payment_method_services.py
+│       └── catalog_services.py  # Catalog queries, filters & search
 ├── frontend/                    # Landing page & UI files (index.html)
-│   ├── pages/                   # register.html, payment.html
-│   ├── scripts/                 # landing.js, register.js, payment.js
-│   └── styles/                  # global.css, landing.css, auth.css, payment.css
+│   ├── pages/                   # register.html, payment.html, catalog.html, media.html
+│   ├── scripts/                 # landing.js, register.js, payment.js, catalog-api.js, catalog.js, media.js
+│   └── styles/                  # global.css, landing.css, auth.css, payment.css, catalog.css
 ├── tests/
-│   ├── test_account.py                  # Pytest integration tests (accounts)
-│   ├── test_payment_method.py           # Pytest integration tests (payment methods API)
-│   └── test_payment_method_models.py    # Unit tests (no database needed)
+│    ├── test_account.py                  # Pytest integration tests (accounts)
+│    ├── test_payment_method.py           # Pytest integration tests (payment methods API)
+│    ├── test_payment_method_models.py    # Unit tests (no database needed)
+│    ├── test_catalog.py                  # RF10–RF12 PostgreSQL integration tests
+│    └── test_catalog_api.py              # HTTP validation, access control & errors
 ├── pytest.ini                   # Pytest path configuration
 └── README.md
 ```
@@ -110,7 +115,7 @@ QuaseFlix/
 
 3. **Install the required Python packages:**
    ```bash
-   pip install fastapi uvicorn "psycopg[binary]" pytest httpx
+   pip install -r requirements.txt
    ```
 
 ---

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo | QuaseFlix</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/catalog.css" />
+</head>
+<body>
+  <header class="catalog-header">
+    <a class="brand-logo" href="./catalog.html">QUASEFLIX</a>
+    <nav aria-label="Navegação principal">
+      <a href="./profiles.html">Minha conta</a>
+      <button type="button" id="btn-logout" class="btn btn-primary btn-sm">Sair</button>
+    </nav>
+  </header>
+  <main class="catalog-main">
+    <h1>Encontre sua próxima história</h1>
+    <p class="muted">Explore filmes e séries ou busque por título, diretor e elenco.</p>
+    <form id="catalog-filters" class="catalog-filters" role="search">
+      <div class="filter-field search-field">
+        <label for="search">Buscar no catálogo</label>
+        <input type="search" id="search" name="q" maxlength="200" placeholder="Título, diretor ou ator" />
+      </div>
+      <div class="filter-field">
+        <label for="media-type">Formato</label>
+        <select id="media-type" name="media_type">
+          <option value="">Filmes e séries</option>
+          <option value="movie">Filmes</option>
+          <option value="series">Séries</option>
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="genre">Gênero</label>
+        <select id="genre" name="genre_id"><option value="">Todos os gêneros</option></select>
+      </div>
+      <button class="btn btn-primary btn-sm" type="submit">Buscar</button>
+      <button class="btn btn-secondary btn-sm" type="reset">Limpar filtros</button>
+    </form>
+    <p id="genre-status" role="status"></p>
+    <p id="catalog-status" role="status" aria-live="polite">Carregando catálogo…</p>
+    <button id="retry" class="btn btn-secondary btn-sm" type="button" hidden>Tentar novamente</button>
+    <div id="catalog-results" aria-busy="true"></div>
+    <section id="suggestions" aria-labelledby="suggestions-title" hidden>
+      <h2 id="suggestions-title">Sugestões populares</h2>
+      <div id="suggestion-items" class="media-grid"></div>
+    </section>
+    <nav id="pagination" class="pagination" aria-label="Páginas do catálogo" hidden>
+      <button id="previous-page" class="btn btn-secondary btn-sm" type="button">Anterior</button>
+      <span id="page-info"></span>
+      <button id="next-page" class="btn btn-secondary btn-sm" type="button">Próxima</button>
+    </nav>
+  </main>
+  <script src="../scripts/session.js"></script>
+  <script src="../scripts/catalog-api.js"></script>
+  <script src="../scripts/catalog.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalhes da obra | QuaseFlix</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/catalog.css" />
+</head>
+<body>
+  <header class="catalog-header">
+    <a class="brand-logo" href="./catalog.html">QUASEFLIX</a>
+    <nav aria-label="Navegação principal">
+      <a id="back-to-catalog" href="./catalog.html">Voltar ao catálogo</a>
+      <button type="button" id="btn-logout" class="btn btn-primary btn-sm">Sair</button>
+    </nav>
+  </header>
+  <main class="catalog-main">
+    <p id="media-status" role="status" aria-live="polite">Carregando detalhes…</p>
+    <button id="retry" class="btn btn-secondary btn-sm" type="button" hidden>Tentar novamente</button>
+    <article id="media-details" hidden>
+      <p id="media-type" class="eyebrow"></p>
+      <h1 id="media-title"></h1>
+      <p id="media-synopsis" class="synopsis"></p>
+      <dl id="metadata" class="metadata"></dl>
+      <section id="seasons" aria-labelledby="seasons-title" hidden>
+        <h2 id="seasons-title">Temporadas e episódios</h2>
+        <div id="season-items"></div>
+      </section>
+    </article>
+  </main>
+  <script src="../scripts/session.js"></script>
+  <script src="../scripts/catalog-api.js"></script>
+  <script src="../scripts/media.js"></script>
+</body>
+</html>

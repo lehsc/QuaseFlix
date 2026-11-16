@@ -4,8 +4,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   const API_BASE_URL = "http://localhost:8000";
 
-  // Screen shown after a successful login (profile selection, see profiles.html).
-  const POST_LOGIN_URL = "./profiles.html";
+  // Catalog access uses the authenticated account until Module 3 adds profiles.
+  const POST_LOGIN_URL = "./catalog.html";
 
   // What the user reads for each HTTP status the login endpoint can answer with.
   const LOGIN_ERROR_MESSAGES = {

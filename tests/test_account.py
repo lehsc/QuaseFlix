@@ -107,3 +107,35 @@ def test_register_account_requires_a_password(account_payload):
     response = client.post("/api/accounts/", json = account_payload)
 
     assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.parametrize("phone", [None, "", "31999998888"])
+def test_register_account_accepts_optional_phone(account_payload, monkeypatch, phone):
+    account_payload["phone"] = phone
+    saved_accounts = []
+
+    def save(account):
+        saved_accounts.append(account)
+        return 123
+
+    monkeypatch.setattr(accounts, "service_register_account", save)
+    response = client.post("/api/accounts/", json=account_payload)
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json()["id"] == 123
+    assert saved_accounts[0].phone == phone
+
+
+def test_register_account_accepts_omitted_phone(account_payload, monkeypatch):
+    del account_payload["phone"]
+    saved_accounts = []
+
+    def save(account):
+        saved_accounts.append(account)
+        return 123
+
+    monkeypatch.setattr(accounts, "service_register_account", save)
+    response = client.post("/api/accounts/", json=account_payload)
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert saved_accounts[0].phone is None
