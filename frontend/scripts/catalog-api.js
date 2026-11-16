@@ -23,6 +23,10 @@ const CatalogAPI = (() => {
       throw new Error("Sua sessão não permite acessar o catálogo. Entre novamente.");
     }
     if (!response.ok) {
+      if (response.status === 409) {
+        window.location.href = "./profiles.html";
+        throw new Error("Selecione um perfil para acessar o catálogo.");
+      }
       const error = new Error(response.status === 404
         ? "Esta obra não está disponível no catálogo."
         : "Não foi possível carregar o catálogo. Tente novamente.");

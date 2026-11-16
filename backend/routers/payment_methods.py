@@ -1,6 +1,7 @@
 import logging
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
+from backend.routers.auth import get_current_account
 
 from backend.exceptions import AccountNotFoundError
 from backend.models.boleto import Boleto
@@ -38,7 +39,9 @@ def _build_payment_method(account_id: int, payload: PaymentMethodCreateSchema) -
 
 
 @router.post("", status_code = status.HTTP_201_CREATED)
-def api_register_payment_method(account_id: int, payload: PaymentMethodCreateSchema):
+def api_register_payment_method(account_id: int, payload: PaymentMethodCreateSchema, account = Depends(get_current_account)):
+    if account.id != account_id:
+        raise HTTPException(403, "Account access denied.")
     try:
         payment_method = _build_payment_method(account_id, payload)
         payment_method_id = service_register_payment_method(payment_method)

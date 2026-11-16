@@ -23,6 +23,9 @@
         <h1 class="auth-title">Entrar</h1>
         <p class="auth-subtitle">Use o e-mail e a senha da sua conta para continuar.</p>
 
+        <div id="google-login"></div>
+        <button id="google-unavailable" type="button" class="btn btn-primary btn-lg btn-block" disabled>Continuar com Google</button>
+        <p id="google-status" role="status" class="auth-subtitle"></p>
         <form id="login-form" class="auth-form" novalidate>
           <!-- Errors of the whole form (wrong password, canceled account, ...) -->
           <p id="login-error" class="form-alert" role="alert" hidden></p>
@@ -66,10 +69,12 @@
           <p>Novo por aqui? <a href="./register.html" class="auth-link">Assine agora</a>.</p>
         </div>
       </div>
+    <p><a href="./subscription.html">Gerenciar / restaurar assinatura</a></p>
     </main>
   </div>
 
   <script src="../scripts/session.js"></script>
   <script src="../scripts/login.js"></script>
+<script src="../scripts/google-login.js"></script>
 </body>
 </html>

@@ -26,7 +26,7 @@ def _status_from_database(value: str | None) -> AccountStatus:
     return AccountStatus[value] if value else AccountStatus.TRIAL
 
 
-def authenticate(email: str, password: str) -> AuthenticatedAccount:
+def authenticate(email: str, password: str, require_access: bool = True) -> AuthenticatedAccount:
     """
     Checks the e-mail and password and returns the account.
 
@@ -52,7 +52,10 @@ def authenticate(email: str, password: str) -> AuthenticatedAccount:
     account = AuthenticatedAccount(
         account_id, account_email, _status_from_database(status), plan_id, created_at
     )
-    account.ensure_can_access(now)
+    if require_access:
+        account.ensure_can_access(now)
+        from backend.services.subscription_services import ensure_paid
+        ensure_paid(account.id)
     return account
 
 
@@ -76,4 +79,6 @@ def get_account_for_access(account_id: int) -> AuthenticatedAccount:
         account_id, account_email, _status_from_database(status), plan_id, created_at
     )
     account.ensure_can_access(now)
+    from backend.services.subscription_services import ensure_paid
+    ensure_paid(account.id)
     return account

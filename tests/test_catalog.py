@@ -16,6 +16,8 @@ from backend.main import app
 from backend.models.account_status import AccountStatus
 from backend.models.authenticated_account import AuthenticatedAccount
 from backend.routers.auth import get_current_account
+from backend.routers.profiles import require_selected_profile
+from backend.models.profile import SelectedProfile
 from backend.services import catalog_services
 
 
@@ -73,6 +75,8 @@ def catalog(monkeypatch):
             yield conn
         monkeypatch.setattr(catalog_services, "get_db_connection", transaction_connection)
         previous_override = app.dependency_overrides.get(get_current_account)
+        app.dependency_overrides[require_selected_profile] = lambda: SelectedProfile(
+            1, 7, "Principal", False, False, ())
         app.dependency_overrides[get_current_account] = lambda: AuthenticatedAccount(
             7, "catalog@example.com", AccountStatus.ACTIVE, 1, datetime.now())
         try:
@@ -80,6 +84,7 @@ def catalog(monkeypatch):
                 yield dict(client=client, conn=conn, genre=genre, other_genre=other_genre, empty_genre=empty_genre,
                            movie=movie, series=series, literal=literal, sparse=sparse, orphan=orphan)
         finally:
+            app.dependency_overrides.pop(require_selected_profile, None)
             if previous_override is None:
                 app.dependency_overrides.pop(get_current_account, None)
             else:
@@ -221,3 +226,29 @@ def test_rf11_language_constraints_and_cascade(catalog):
             catalog["conn"].execute("INSERT INTO public.media_language VALUES (%s, %s, %s)", (catalog["movie"], kind, language))
     catalog["conn"].execute("DELETE FROM public.media WHERE id = %s", (catalog["movie"],))
     assert catalog["conn"].execute("SELECT count(*) FROM public.media_language WHERE media_id = %s", (catalog["movie"],)).fetchone()[0] == 0
+
+
+def test_child_profile_filters_catalog_search_suggestions_and_details(catalog):
+    catalog["conn"].execute("UPDATE public.media SET age_rating=0 WHERE id=%s", (catalog["movie"],))
+    catalog["conn"].execute("UPDATE public.media SET age_rating=18 WHERE id=%s", (catalog["series"],))
+    app.dependency_overrides[require_selected_profile] = lambda: SelectedProfile(
+        1, 7, "Child", True, True, ())
+    assert ids(browse(catalog)) == [catalog["movie"]]
+    assert ids(browse(catalog, q="Alice")) == [catalog["movie"]]
+    data = browse(catalog, q="Horizontes")
+    assert data["total"] == 0
+    assert [item["id"] for item in data["suggestions"]] == [catalog["movie"]]
+    for key in ["series", "literal", "sparse"]:
+        assert catalog["client"].get(f"/api/catalog/{catalog[key]}").status_code == 404
+    assert catalog["client"].get(f"/api/catalog/{catalog['movie']}").status_code == 200
+
+
+def test_profile_preferences_rank_before_pagination_without_hiding_other_titles(catalog):
+    catalog["conn"].execute("INSERT INTO public.media_genre VALUES (%s,%s)",
+                            (catalog["series"], catalog["empty_genre"]))
+    app.dependency_overrides[require_selected_profile] = lambda: SelectedProfile(
+        1, 7, "Principal", False, False, (catalog["empty_genre"],))
+    data = browse(catalog, limit=1)
+    assert data["total"] == 4
+    assert ids(data) == [catalog["series"]]
+    assert browse(catalog, q="Viagem")["total"] == 1

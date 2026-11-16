@@ -5,9 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const API_BASE_URL = "http://localhost:8000";
 
   // The account id is saved by register.js right after the account is created.
-  const accountId = sessionStorage.getItem("quaseflix_account_id");
+  const accountId = JSON.parse(sessionStorage.getItem("quaseflix_account") || "null")?.id;
   if (!accountId) {
-    window.location.href = "./register.html";
+    window.location.href = "./login.html";
     return;
   }
 
@@ -192,7 +192,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const response = await fetch(`${API_BASE_URL}/api/accounts/${accountId}/payment-methods`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${sessionStorage.getItem("quaseflix_token") || ""}`
         },
         body: JSON.stringify(buildPayload())
       });

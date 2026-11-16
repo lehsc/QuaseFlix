@@ -4,13 +4,13 @@
 document.addEventListener("DOMContentLoaded", () => {
   const API_BASE_URL = "http://localhost:8000";
 
-  // Catalog access uses the authenticated account until Module 3 adds profiles.
-  const POST_LOGIN_URL = "./catalog.html";
+  // Select a profile before browsing the catalog.
+  const POST_LOGIN_URL = "./profiles.html";
 
   // What the user reads for each HTTP status the login endpoint can answer with.
   const LOGIN_ERROR_MESSAGES = {
     401: "E-mail ou senha incorretos.",
-    402: "Seu período de teste terminou e não há uma assinatura ativa. Regularize o pagamento para voltar a assistir.",
+    402: "Sua assinatura precisa ser regularizada. Acesse Gerenciar / restaurar assinatura para consultar os débitos.",
     403: "Esta conta foi cancelada e não pode ser acessada."
   };
   const GENERIC_ERROR_MESSAGE = "Não foi possível entrar. Tente novamente em instantes.";

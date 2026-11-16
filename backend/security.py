@@ -114,6 +114,7 @@ def create_access_token(account_id: int, now: float | None = None) -> str:
     payload = {
         "sub": str(account_id),
         "iat": issued_at,
+        "jti": secrets.token_urlsafe(24),  # Independent profile selections per login.
         "exp": issued_at + ACCESS_TOKEN_TTL_SECONDS,
     }
     signing_input = f"{_json_segment(_TOKEN_HEADER)}.{_json_segment(payload)}"

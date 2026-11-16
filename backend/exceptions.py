@@ -32,10 +32,10 @@ class AccountCanceledError(Exception):
 
 
 class SubscriptionExpiredError(Exception):
-    """Raised when the free trial is over and the account is not active."""
+    """Raised when the trial ended or an invoice is overdue."""
 
-    def __init__(self, account_id: int):
-        super().__init__("The free trial has ended and there is no active subscription.")
+    def __init__(self, account_id: int, message: str = "The free trial has ended and there is no active subscription."):
+        super().__init__(message)
         self.account_id = account_id
 
 

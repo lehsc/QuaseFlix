@@ -11,12 +11,16 @@ from backend.models.authenticated_account import AuthenticatedAccount
 from backend.routers import auth
 from backend.security import create_access_token
 from backend.services import catalog_services
+from backend.services import profile_services
 
 
 @pytest.fixture
 def catalog_client(monkeypatch):
     account = AuthenticatedAccount(7, "catalog@example.com", AccountStatus.ACTIVE, 1, datetime.now())
     monkeypatch.setattr(auth, "service_get_account_for_access", lambda account_id: account)
+    monkeypatch.setattr(profile_services, "current_selection", lambda *args: {
+        "profile": dict(id=1, account_id=7, name="Principal", is_kids=False,
+                        restricted=False, genre_ids=()), "restricted": False})
     with TestClient(app) as client:
         client.headers["Authorization"] = f"Bearer {create_access_token(7)}"
         yield client
@@ -61,6 +65,14 @@ def test_missing_media(catalog_client, monkeypatch):
     response = catalog_client.get("/api/catalog/999")
     assert response.status_code == 404
     assert response.json() == {"detail": "Media 999 not found."}
+
+
+@pytest.mark.parametrize("path", ["/api/catalog", "/api/catalog/1"])
+def test_catalog_requires_a_selected_profile(catalog_client, monkeypatch, path):
+    monkeypatch.setattr(profile_services, "current_selection", lambda *args: {
+        "profile": None, "restricted": True})
+    response = catalog_client.get(path)
+    assert response.status_code == 409
 
 
 @pytest.mark.parametrize("path,service,message", [

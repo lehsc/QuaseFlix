@@ -12,7 +12,7 @@ _FROM = """
     LEFT JOIN public.series series ON series.media_id = m.id
 """
 _SUMMARY = """
-    m.id, m.title, m.release_year,
+    m.id, m.title, m.release_year, m.age_rating,
     CASE WHEN movie.media_id IS NOT NULL THEN 'movie' ELSE 'series' END AS media_type,
     ARRAY(SELECT g.name FROM public.genre g
           JOIN public.media_genre mg ON mg.genre_id = g.id
@@ -20,10 +20,12 @@ _SUMMARY = """
 """
 
 
-def _filters(media_type=None, genre_id=None, query=None):
+def _filters(media_type=None, genre_id=None, query=None, restricted=False):
     # Untyped media are not available works in the catalog.
     clauses = ["(movie.media_id IS NOT NULL OR series.media_id IS NOT NULL)"]
     params = []
+    if restricted:
+        clauses.append("m.age_rating = 0")
     if media_type == "movie":
         clauses.append("movie.media_id IS NOT NULL")
     elif media_type == "series":
@@ -62,26 +64,34 @@ def list_genres() -> list[GenreSchema]:
 def list_catalog(
     query: str = "", media_type: MediaType | None = None,
     genre_id: int | None = None, limit: int = 24, offset: int = 0,
+    restricted: bool = False,
+    preferred_genre_ids: tuple[int, ...] = (),
 ) -> CatalogSchema:
     query = query.strip()
-    where, params = _filters(media_type, genre_id, query)
+    where, params = _filters(media_type, genre_id, query, restricted)
+    preference_order = ""
+    order_params = []
+    if preferred_genre_ids:
+        preference_order = """(SELECT count(*) FROM public.media_genre preferred
+            WHERE preferred.media_id=m.id AND preferred.genre_id=ANY(%s)) DESC, """
+        order_params = [list(preferred_genre_ids)]
     with get_db_connection() as conn, conn.cursor(row_factory=dict_row) as cursor:
         cursor.execute("SELECT COUNT(*) AS total " + _FROM + where, params)
         total = cursor.fetchone()["total"]
         cursor.execute(
             "SELECT " + _SUMMARY + _FROM + where
-            + " ORDER BY LOWER(m.title), m.id LIMIT %s OFFSET %s",
-            [*params, limit, offset],
+            + " ORDER BY " + preference_order + "LOWER(m.title), m.id LIMIT %s OFFSET %s",
+            [*params, *order_params, limit, offset],
         )
         items = [MediaSummarySchema(**row) for row in cursor.fetchall()]
         suggestions = []
         if query and total == 0:
             # Keep the selected format/genre when suggesting popular works.
-            fallback_where, fallback_params = _filters(media_type, genre_id)
+            fallback_where, fallback_params = _filters(media_type, genre_id, restricted=restricted)
             cursor.execute(
                 "SELECT " + _SUMMARY + _FROM + fallback_where
-                + " ORDER BY m.popularity_score DESC, LOWER(m.title), m.id LIMIT 6",
-                fallback_params,
+                + " ORDER BY " + preference_order + "m.popularity_score DESC, LOWER(m.title), m.id LIMIT 6",
+                [*fallback_params, *order_params],
             )
             suggestions = [MediaSummarySchema(**row) for row in cursor.fetchall()]
     return CatalogSchema(items=items, total=total, limit=limit, offset=offset,

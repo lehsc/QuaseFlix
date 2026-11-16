@@ -16,6 +16,7 @@ class MediaSummarySchema(BaseModel):
     media_type: MediaType
     release_year: int | None
     genres: list[str]
+    age_rating: int | None = None
 
 
 class EpisodeSchema(BaseModel):

@@ -197,3 +197,16 @@ def test_register_payment_method_failure(credit_card_payload, monkeypatch):
     assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
     # The internal error message must not reach the client.
     assert response.json() == {"detail": "Unable to register payment method."}
+
+
+@pytest.fixture(autouse=True)
+def authenticated_request():
+    """These tests exercise services; ownership is tested in test_registration."""
+    from fastapi import Request
+    from types import SimpleNamespace
+    from backend.routers.auth import get_current_account
+    def owner(request: Request):
+        return SimpleNamespace(id=int(request.path_params.get("account_id", 1)))
+    app.dependency_overrides[get_current_account] = owner
+    yield
+    app.dependency_overrides.pop(get_current_account, None)

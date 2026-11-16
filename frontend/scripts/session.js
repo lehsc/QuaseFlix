@@ -7,11 +7,13 @@ const QuaseflixSession = (() => {
   const ACCOUNT_KEY = "quaseflix_account";
 
   const save = (token, account) => {
+    sessionStorage.removeItem("quaseflix_profile");
     sessionStorage.setItem(TOKEN_KEY, token);
     sessionStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
   };
 
   const clear = () => {
+    sessionStorage.removeItem("quaseflix_profile");
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(ACCOUNT_KEY);
   };
@@ -26,5 +28,10 @@ const QuaseflixSession = (() => {
     }
   };
 
-  return { save, clear, getToken, getAccount };
+  const setProfile = (profile) => {
+    if (profile) sessionStorage.setItem("quaseflix_profile", JSON.stringify(profile));
+    else sessionStorage.removeItem("quaseflix_profile");
+  };
+
+  return { save, clear, getToken, getAccount, setProfile };
 })();
