@@ -41,3 +41,11 @@ class SubscriptionExpiredError(Exception):
 
 class InvalidTokenError(Exception):
     """Raised when an access token is malformed, tampered with or expired."""
+
+
+class MediaNotFoundError(Exception):
+    """Raised when a work is not available in the catalog."""
+
+    def __init__(self, media_id: int):
+        super().__init__(f"Media {media_id} not found.")
+        self.media_id = media_id

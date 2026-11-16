@@ -34,21 +34,26 @@ QuaseFlix/
 │   │   └── payment_type.py      # PaymentType enum
 │   ├── schemas/
 │   │   ├── account_schema.py    # Pydantic request schemas
-│   │   └── payment_method_schema.py
+│   │   ├── payment_method_schema.py
+│   │   └── catalog_schema.py    # Catalog & media detail response schemas
 │   ├── routers/
 │   │   ├── accounts.py          # Account API endpoints
-│   │   └── payment_methods.py   # Payment method API endpoints
+│   │   ├── payment_methods.py   # Payment method API endpoints
+│   │   └── catalog.py           # Catalog, search & media detail API endpoints
 │   └── services/
 │       ├── account_services.py  # Business logic & SQL queries
-│       └── payment_method_services.py
+│       ├── payment_method_services.py
+│       └── catalog_services.py  # Catalog queries, filters & search
 ├── frontend/                    # Landing page & UI files (index.html)
-│   ├── pages/                   # register.html, payment.html
-│   ├── scripts/                 # landing.js, register.js, payment.js
-│   └── styles/                  # global.css, landing.css, auth.css, payment.css
+│   ├── pages/                   # register.html, payment.html, catalog.html, media.html
+│   ├── scripts/                 # landing.js, register.js, payment.js, catalog-api.js, catalog.js, media.js
+│   └── styles/                  # global.css, landing.css, auth.css, payment.css, catalog.css
 ├── tests/
-│   ├── test_account.py                  # Pytest integration tests (accounts)
-│   ├── test_payment_method.py           # Pytest integration tests (payment methods API)
-│   └── test_payment_method_models.py    # Unit tests (no database needed)
+│    ├── test_account.py                  # Pytest integration tests (accounts)
+│    ├── test_payment_method.py           # Pytest integration tests (payment methods API)
+│    ├── test_payment_method_models.py    # Unit tests (no database needed)
+│    ├── test_catalog.py                  # RF10–RF12 PostgreSQL integration tests
+│    └── test_catalog_api.py              # HTTP validation, access control & errors
 ├── pytest.ini                   # Pytest path configuration
 └── README.md
 ```
@@ -110,7 +115,7 @@ QuaseFlix/
 
 3. **Install the required Python packages:**
    ```bash
-   pip install fastapi uvicorn "psycopg[binary]" pytest httpx
+   pip install -r requirements.txt
    ```
 
 ---
@@ -344,12 +349,12 @@ API routes (all require a current, eligible account):
 Requests never accept an account ID for profile ownership. Foreign profile IDs
 return 404. Canceled/overdue accounts must use subscription management instead.
 
-**Catalog integration remains pending (RF10–RF14).** This change persists
-preferences and parental settings and provides a tested shared content policy;
-it does not implement catalog browsing, search, recommendations screens, or
-playback. Future content endpoints must use `require_selected_profile` and the
-functions in `backend/services/content_policy.py` for browsing, search, details,
-and playback. `media.age_rating` accepts 0 (Livre), 10, 12, 14, 16, 18 or NULL.
+**Catalog integration (RF10–RF12).** Select a profile and choose "Explorar catálogo"
+to browse, filter, search and view media details. Catalog endpoints require the
+server-side profile selection. Lists and suggestions apply the child-content
+restriction in SQL before pagination and rank preferred genres first; details
+use the shared content policy. Playback remains outside this module.
+`media.age_rating` accepts 0 (Livre), 10, 12, 14, 16, 18 or NULL.
 Child mode allows only explicitly classified Livre titles; unknown ratings are
 excluded. Content is filtered before ranking by preferred genres. If no eligible
 title matches the preferences, the complete eligible collection remains visible.
@@ -357,3 +362,10 @@ No frontend filtering or client-provided profile ID may replace these checks.
 
 Profile integration tests require `QUASEFLIX_TEST_DATABASE_URL` pointing to an
 initialized disposable database, as with the subscription integration tests.
+
+Existing databases also need `backend/database/migrations/002_catalog.sql` for
+catalog languages and popularity. It is separate from `002_registration.sql`;
+apply both, along with the subscription and profile migrations. New databases
+already include all modules in `schema.sql`. Demo data in
+`backend/database/seeds/catalog_demo.sql` is unclassified and consequently hidden
+from child profiles until a rating is explicitly assigned.

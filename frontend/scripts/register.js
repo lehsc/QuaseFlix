@@ -85,8 +85,8 @@ async function post(path, data) {
   });
   const result = await response.json();
   if (!response.ok) {
-    if (typeof result.detail === "string") throw new Error(result.detail);
-    const first = Array.isArray(result.detail) ? result.detail[0] : null;
+    if (typeof result?.detail === "string") throw new Error(result.detail);
+    const first = Array.isArray(result?.detail) ? result.detail[0] : null;
     const error = new Error(first?.msg || "Verifique os dados informados.");
     error.fieldName = first?.loc?.at(-1);
     throw error;

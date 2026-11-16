@@ -872,6 +872,24 @@ ALTER TABLE ONLY public.series
 -- PostgreSQL database dump complete
 --
 
+-- Catalog metadata and lookup indexes (also migration 002).
+ALTER TABLE public.media ADD COLUMN popularity_score integer NOT NULL
+    DEFAULT 0 CHECK (popularity_score >= 0);
+
+CREATE TABLE public.media_language (
+    media_id integer NOT NULL REFERENCES public.media(id) ON DELETE CASCADE,
+    kind varchar(8) NOT NULL CHECK (kind IN ('audio', 'subtitle')),
+    language varchar(100) NOT NULL CHECK (length(trim(language)) > 0),
+    PRIMARY KEY (media_id, kind, language)
+);
+
+CREATE INDEX media_genre_genre_idx ON public.media_genre (genre_id, media_id);
+CREATE INDEX media_actor_actor_idx ON public.media_actor (actor_id, media_id);
+CREATE INDEX movie_director_idx ON public.movie (director_id);
+CREATE INDEX episode_director_idx ON public.episode (director_id);
+CREATE INDEX media_title_idx ON public.media (lower(title), id);
+CREATE INDEX media_popularity_idx ON public.media (popularity_score DESC, lower(title), id);
+
 \unrestrict QvYWveozZ44eJVyyJINScZbazEMMNcaE238XccZoUOKYcnCQdiSMYbCg2TdmJmr
 
 

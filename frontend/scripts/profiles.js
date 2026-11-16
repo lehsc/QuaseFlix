@@ -96,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function render() {
     document.querySelector('#retry').hidden = true;
+    document.querySelector('#open-catalog').hidden = !selection.profile;
     document.querySelector('#profile-count').textContent = `${profiles.length} de 4 perfis`;
     document.querySelector('#selected-profile').textContent = selection.profile
       ? `Perfil selecionado: ${selection.profile.name}${selection.restricted ? ' — modo infantil' : ''}`

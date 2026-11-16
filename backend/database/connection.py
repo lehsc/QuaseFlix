@@ -1,7 +1,11 @@
+import os
+
 import psycopg
 from contextlib import contextmanager
 
-DATABASE_URL = "postgresql://postgres:quaseflix@localhost:5432/quaseflix"
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL", "postgresql://postgres:quaseflix@localhost:5432/quaseflix"
+)
 
 @contextmanager
 def get_db_connection():

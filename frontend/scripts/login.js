@@ -4,7 +4,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const API_BASE_URL = "http://localhost:8000";
 
-  // Screen shown after a successful login (profile selection, see profiles.html).
+  // Select a profile before browsing the catalog.
   const POST_LOGIN_URL = "./profiles.html";
 
   // What the user reads for each HTTP status the login endpoint can answer with.

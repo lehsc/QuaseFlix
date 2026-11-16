@@ -9,5 +9,5 @@ class AccountCreateSchema(BaseModel):
     password: str = Field(min_length = 6, max_length = 128)
     cpf: str
     birth_date: date
-    phone: str
+    phone: str | None = None
     address: str
